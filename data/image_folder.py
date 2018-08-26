@@ -4,17 +4,18 @@
 # By Samaneh Azadi
 ################################################################################
 
-from torch import transpose
-import torch.utils.data as data
-from torch import index_select,LongTensor
-from PIL import Image
 import os
 import os.path
-import numpy as np
-from scipy import misc
 import random
-from options.train_options import TrainOptions
+
+import numpy as np
 import torch
+import torch.utils.data as data
+from PIL import Image
+from scipy import misc
+from torch import LongTensor, index_select, transpose
+
+from options.train_options import TrainOptions
 
 opt = TrainOptions().parse()  # set CUDA_VISIBLE_DEVICES before import torch
 
@@ -47,19 +48,19 @@ def font_transform(img,path, rgb_in):
     D_ = img.size()[2]/target_size
     # warnings.warn("size, %s %s"%(img.size(),D_))
     if not rgb_in:
-        img = torch.mean(img,dim=0) #only one of the RGB channels    
+        img = torch.mean(img, dim=0) # pylint: disable=E1101 #only one of the RGB channels
         img = img[None,:,:] #(1,64,64)
         n_rgb =1
     else:
         img = img.permute(1,0,2).contiguous().view(1,target_size, n_rgb*img.size()[2])
-        
+
     slices = []
     for j in range(target_size):
         for i in np.arange(0,D_):
             slices += list(target_size * np.arange(i,D_*n_rgb,D_) + j)
     img = index_select(img,2,LongTensor(slices)).view(target_size,target_size,D_*n_rgb)
     img = img.permute(2,0,1)
-    return img           
+    return img
 
 
 class ImageFolder(data.Dataset):
@@ -74,9 +75,9 @@ class ImageFolder(data.Dataset):
 
         self.root = root
         self.imgs = imgs
-        
+
         if no_permutation:
-           self.imgs= sorted(self.imgs)
+            self.imgs= sorted(self.imgs)
         self.transform = transform
         self.return_paths = return_paths
         self.loader = loader
@@ -87,14 +88,13 @@ class ImageFolder(data.Dataset):
         self.loadSize=loadSize
 
 
-   
     def __getitem__(self, index):
         path = self.imgs[index]
         img = self.loader(path)
         if self.transform is not None:
-			img = self.transform(img)
-			if (self.font_trans):
-				img = font_transform(img,path, self.rgb)
+            img = self.transform(img)
+            if (self.font_trans):
+                img = font_transform(img,path, self.rgb)
         if self.return_paths:
             return img, path
         else:

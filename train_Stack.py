@@ -6,6 +6,7 @@
 
 import time
 from options.train_options import TrainOptions
+
 opt = TrainOptions().parse()  # set CUDA_VISIBLE_DEVICES before import torch
 
 from models.models import create_model
@@ -24,18 +25,18 @@ model = create_model(opt)
 visualizer = Visualizer(opt)
 
 total_steps = 0
-  
-epoch =int(opt.which_epoch1)
-epoch0 = epoch 
-print "starting propagating back to the first network with starting lr %s ..."%opt.lr
+
+epoch = int(opt.which_epoch1)
+epoch0 = epoch
+print("starting propagating back to the first network with starting lr", opt.lr)
 opt.lr = opt.lr
 opt.continue_train = False
 opt.use_dropout = True
 opt.use_dropout1 = True
 model = create_model(opt)
-visualizer = Visualizer(opt) 
+visualizer = Visualizer(opt)
 print('saving the model at the end of epoch %d, iters %d' %
-    (epoch0, total_steps))
+      (epoch0, total_steps))
 model.save(epoch0)
 
 for epoch in range(1, opt.niter + opt.niter_decay + 1):
@@ -50,7 +51,6 @@ for epoch in range(1, opt.niter + opt.niter_decay + 1):
         else:
             model.optimize_parameters(epoch)
 
-    
         if total_steps % opt.display_freq == 0:
             visualizer.display_current_results(model.get_current_visuals(), epoch)
 
@@ -59,18 +59,18 @@ for epoch in range(1, opt.niter + opt.niter_decay + 1):
             t = (time.time() - iter_start_time) / opt.batchSize
             visualizer.print_current_errors(epoch, epoch_iter, errors, t)
             if opt.display_id > 0:
-                visualizer.plot_current_errors(epoch, float(epoch_iter)/dataset_size, opt, errors)
+                visualizer.plot_current_errors(epoch, float(epoch_iter) / dataset_size, opt, errors)
 
         if total_steps % opt.save_latest_freq == 0:
             print('saving the latest model (epoch %d, total_steps %d)' %
-                  (epoch+epoch0, total_steps))
+                  (epoch + epoch0, total_steps))
             model.save('latest')
 
-    if (epoch % opt.save_epoch_freq == 0):# or (epoch<20):
+    if epoch % opt.save_epoch_freq == 0:  # or (epoch<20):
         print('saving the model at the end of epoch %d, iters %d' %
-              (epoch+epoch0, total_steps))
+              (epoch + epoch0, total_steps))
         model.save('latest')
-        model.save(epoch+epoch0)
+        model.save(epoch + epoch0)
 
     print('End of epoch %d / %d \t Time Taken: %d sec' %
           (epoch, opt.niter + opt.niter_decay, time.time() - epoch_start_time))

@@ -4,6 +4,7 @@
 # By Samaneh Azadi
 ################################################################################
 
+
 def create_model(opt):
     model = None
     print(opt.model)

@@ -81,7 +81,7 @@ Given a few letters of font ```${DATA}``` for examples 5 letters {T,O,W,E,R}, tr
 ./scripts/train_cGAN.sh Capitals64
 ```
 
-Model parameters will be saved under ```./checkpoints/GlyphNet_pretrain```. 
+Model parameters will be saved under ```./checkpoints/GlyphNet_pretrain```.
 
 - Test Glyph Network after specific numbers of epochs (e.g. 400 by setting ```EPOCH=400``` in ```./scripts/test_cGAN.sh```):
 ```bash
@@ -139,9 +139,9 @@ Follow the previous steps to visualize generated images and training curves wher
 
 ### Training/test Details
 
-- Flags: see ```options/train_options.py```, ```options/base_options.py``` and ```options/test_options.py``` for explanations on each flag. 
+- Flags: see ```options/train_options.py```, ```options/base_options.py``` and ```options/test_options.py``` for explanations on each flag.
 
-- Baselines: if you want to use this code to get results of Image Translation baseline or want to try tiling glyphs rather than stacking, refer to the end of ```scripts/train_cGAN.sh``` . If you only want to train OrnaNet on top of clean glyphs, refer to the end of ```scripts/train_StackGAN.sh```. 
+- Baselines: if you want to use this code to get results of Image Translation baseline or want to try tiling glyphs rather than stacking, refer to the end of ```scripts/train_cGAN.sh``` . If you only want to train OrnaNet on top of clean glyphs, refer to the end of ```scripts/train_StackGAN.sh```.
 
 - Image Dimension: We have tried this network only on ```64x64``` images of letters. We do not scale and crop images since we set both ```opt.FineSize``` and ```opt.LoadSize``` to ```64```.
 

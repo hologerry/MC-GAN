@@ -8,6 +8,7 @@ import os
 import torch
 import numpy as np
 
+
 class BaseModel():
     def name(self):
         return 'BaseModel'
@@ -66,8 +67,7 @@ class BaseModel():
                     weights[key].fill_(1.0)
         if print_weights:
             for key in weights.keys():
-                print key, 'pretrained, mean,std:', torch.mean(weights[key]),torch.std(weights[key])
-
+                print(key, 'pretrained, mean,std:', torch.mean(weights[key]), torch.std(weights[key]))
 
         keys1 = network1.state_dict().keys()
         weights1={}
@@ -75,8 +75,6 @@ class BaseModel():
             weights1[key] = weights[key]
         network1.load_state_dict(weights1)
         weights2={}
-
-
 
         keys2 = network2.state_dict().keys()
         keys2_in_weights = list(set(weights.keys())-set(keys1))
@@ -88,10 +86,8 @@ class BaseModel():
             new_key = ''.join([old_key_i[0],'.',lyr_num])
             new_key = ''.join([new_key,old_key_p2])
             weights2[new_key] = weights[old_key]
-        
+
         network2.load_state_dict(weights2)
-
-
 
     # helper loading function that can be used by subclasses
     def load_network(self, network, network_label, epoch_label,print_weights=False,ignore_BN=False):
@@ -108,7 +104,7 @@ class BaseModel():
                     weights[key].fill_(1.0)
         if print_weights:
             for key in weights.keys():
-                print key, 'pretrained, mean,std:', torch.mean(weights[key]),torch.std(weights[key])
+                print(key, 'pretrained, mean,std:', torch.mean(weights[key]), torch.std(weights[key]))
 
         network.load_state_dict(weights)
 

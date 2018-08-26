@@ -1,13 +1,15 @@
-#=============================
+# =============================
 # From https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix
-#=============================
+# =============================
 
 
 import dominate
 from dominate.tags import *
 import os
 import sys
+from importlib import reload
 reload(sys)
+
 sys.setdefaultencoding('utf8')
 
 

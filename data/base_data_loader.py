@@ -4,13 +4,13 @@
 class BaseDataLoader():
     def __init__(self):
         pass
-    
+
     def initialize(self, opt):
         self.opt = opt
         pass
 
-    def load_data():
+    def load_data():  # pylint: disable=E0211
         return None
 
-        
-        
+
+

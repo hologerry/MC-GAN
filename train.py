@@ -30,7 +30,7 @@ for epoch in range(1, opt.niter + opt.niter_decay + 1):
         epoch_iter = total_steps - dataset_size * (epoch - 1)
         model.set_input(data)
         model.optimize_parameters()
-        
+
         if total_steps % opt.display_freq == 0:
             visualizer.display_current_results(model.get_current_visuals(), epoch)
 
