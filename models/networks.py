@@ -9,7 +9,6 @@ import torch.nn as nn
 from torch.autograd import Variable
 import numpy as np
 import functools
-from torch import index_select, LongTensor
 
 
 def weights_init(m):
@@ -452,8 +451,8 @@ class ResnetBlock(nn.Module):
         return out
 
 
-##Apply a transformation on the input and prediction before feeding into the discriminator
-## in the conditional case
+# Apply a transformation on the input and prediction before feeding into the discriminator
+# in the conditional case
 class InputTransformation(nn.Module):
     def __init__(self, input_nc, nif=32, norm_layer=nn.BatchNorm2d, gpu_ids=[]):
         super(InputTransformation, self).__init__()

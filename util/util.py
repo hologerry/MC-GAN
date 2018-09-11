@@ -60,7 +60,7 @@ def save_image(image_numpy, image_path, rgb):
 
             image_numpy_ = np.zeros((image_numpy.shape[0], image_numpy.shape[1] * n_ch / 3, 3))
             for i in range(n_ch / 3):
-                image_numpy_[:, i * image_numpy.shape[1]:(i + 1) * image_numpy.shape[1], :] = image_numpy[:, :,
+                image_numpy_[:, i * image_numpy.shape[1]:(i + 1) * image_numpy.shape[1], :] = image_numpy[:, :, 
                                                                                               i * 3:(i + 1) * 3]
             image_numpy = image_numpy_.astype('uint8')
 
@@ -74,7 +74,7 @@ def info(object, spacing=10, collapse=1):
     methodList = [e for e in dir(object) if isinstance(getattr(object, e), collections.Callable)]
     processFunc = collapse and (lambda s: " ".join(s.split())) or (lambda s: s)
     print("\n".join(["%s %s" %
-                     (method.ljust(spacing),
+                     (method.ljust(spacing), 
                       processFunc(str(getattr(object, method).__doc__)))
                      for method in methodList]))
 
@@ -89,7 +89,7 @@ def varname(p):
 def print_numpy(x, val=True, shp=False):
     x = x.astype(np.float64)
     if shp:
-        print('shape,', x.shape)
+        print('shape, ', x.shape)
     if val:
         x = x.flatten()
         print('mean = %3.3f, min = %3.3f, max = %3.3f, median = %3.3f, std=%3.3f' % (

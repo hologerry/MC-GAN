@@ -20,7 +20,7 @@ data_loader = CreateDataLoader(opt)
 dataset = data_loader.load_data()
 visualizer = Visualizer(opt)
 
-epoch_list = list(range(26))+list(np.arange(26,101,2))+list(np.arange(101,int(opt.which_epoch1)+1,20))
+epoch_list = list(range(26))+list(np.arange(26, 101, 2))+list(np.arange(101, int(opt.which_epoch1)+1, 20))
 for epoch in epoch_list:
     opt.which_epoch1 = epoch
     model = create_model(opt)

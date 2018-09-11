@@ -6,7 +6,6 @@
 
 import os
 import torch
-import numpy as np
 
 
 class BaseModel():
@@ -53,7 +52,7 @@ class BaseModel():
         if len(gpu_ids) and torch.cuda.is_available():
             network.cuda(device_id=gpu_ids[0])
 
-    def load_combo_network(self, network1, network2, network_label, epoch_label,print_weights=False,ignore_BN=False):
+    def load_combo_network(self, network1, network2, network_label, epoch_label, print_weights=False, ignore_BN=False):
         save_filename = '%s_net_%s.pth' % (epoch_label, network_label)
         save_path = os.path.join(self.save_dir, save_filename)
 
@@ -67,14 +66,14 @@ class BaseModel():
                     weights[key].fill_(1.0)
         if print_weights:
             for key in weights.keys():
-                print(key, 'pretrained, mean,std:', torch.mean(weights[key]), torch.std(weights[key]))
+                print(key, 'pretrained, mean, std:', torch.mean(weights[key]), torch.std(weights[key]))
 
         keys1 = network1.state_dict().keys()
-        weights1={}
+        weights1 = {}
         for key in keys1:
             weights1[key] = weights[key]
         network1.load_state_dict(weights1)
-        weights2={}
+        weights2 = {}
 
         keys2 = network2.state_dict().keys()
         keys2_in_weights = list(set(weights.keys())-set(keys1))
@@ -82,15 +81,15 @@ class BaseModel():
         for old_key in keys2_in_weights:
             old_key_i = old_key.split(".")
             lyr_num = str(int(old_key_i[1])-keys1_last_lyr_number-1)
-            old_key_p2 = old_key.split(''.join([old_key_i[0],'.',old_key_i[1]]))[1]
-            new_key = ''.join([old_key_i[0],'.',lyr_num])
-            new_key = ''.join([new_key,old_key_p2])
+            old_key_p2 = old_key.split(''.join([old_key_i[0], '.', old_key_i[1]]))[1]
+            new_key = ''.join([old_key_i[0], '.', lyr_num])
+            new_key = ''.join([new_key, old_key_p2])
             weights2[new_key] = weights[old_key]
 
         network2.load_state_dict(weights2)
 
     # helper loading function that can be used by subclasses
-    def load_network(self, network, network_label, epoch_label,print_weights=False,ignore_BN=False):
+    def load_network(self, network, network_label, epoch_label, print_weights=False, ignore_BN=False):
         save_filename = '%s_net_%s.pth' % (epoch_label, network_label)
         save_path = os.path.join(self.save_dir, save_filename)
 
@@ -104,7 +103,7 @@ class BaseModel():
                     weights[key].fill_(1.0)
         if print_weights:
             for key in weights.keys():
-                print(key, 'pretrained, mean,std:', torch.mean(weights[key]), torch.std(weights[key]))
+                print(key, 'pretrained, mean, std:', torch.mean(weights[key]), torch.std(weights[key]))
 
         network.load_state_dict(weights)
 

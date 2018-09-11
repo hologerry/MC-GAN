@@ -71,7 +71,7 @@ CUDA_VISIBLE_DEVICES=${CUDA_ID} python train_Stack.py --dataroot ${DATASET}  --n
 							  --which_model_preNet ${PRENET} --fineSize ${FINESIZE} --loadSize ${LOADSIZE} --lambda_A ${LAM_A}\
 							  --lambda_C ${LAM_C} --align_data --use_dropout --display_id 0 --niter ${NITER} --niter_decay ${NITERD}\
 							  --batchSize ${BATCHSIZE} --conditional --save_epoch_freq 100 --rgb_out --partial --which_epoch ${EPOCH} \
-							  --display_freq 5 --print_freq 5 --blanks 0 --conv3d --base_font --base_root ${base_dir} #--gpu_ids 0,1 
+							  --display_freq 5 --print_freq 5 --blanks 0 --conv3d --base_font --base_root ${base_dir} #--gpu_ids 0, 1 
 
 
 # =======================================

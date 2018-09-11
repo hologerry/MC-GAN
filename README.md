@@ -54,7 +54,7 @@ cd MC-GAN
 ```bash
 ./datasets/download_font_dataset.sh public_web_fonts
 ```
-Given a few letters of font ```${DATA}``` for examples 5 letters {T,O,W,E,R}, training directory ```${DATA}/A``` should contain 5 images each with dimension ```64x(64x26)x3``` where ```5 - 1 = 4``` letters are given and the rest are zeroed out. Each image should be saved as ```${DATA}_${IND}.png``` where ```${IND}``` is the index (in [0,26) ) of the letter omitted from the observed set. Training directory ```${DATA}/B``` contains images each with dimension ```64x64x3``` where only the omitted letter is given. Image names are similar to the ones in ```${DATA}/A``` though. ```${DATA}/A/test/${DATA}.png``` contains all 5 given letters as a ```64x(64x26)x3```-dimensional image. Structure of the directories for above real-world fonts (including only a few observed letters) is as follows.  One can refer to the examples in ```../datasets/public_web_fonts``` for more information.
+Given a few letters of font ```${DATA}``` for examples 5 letters {T, O, W, E, R}, training directory ```${DATA}/A``` should contain 5 images each with dimension ```64x(64x26)x3``` where ```5 - 1 = 4``` letters are given and the rest are zeroed out. Each image should be saved as ```${DATA}_${IND}.png``` where ```${IND}``` is the index (in [0, 26) ) of the letter omitted from the observed set. Training directory ```${DATA}/B``` contains images each with dimension ```64x64x3``` where only the omitted letter is given. Image names are similar to the ones in ```${DATA}/A``` though. ```${DATA}/A/test/${DATA}.png``` contains all 5 given letters as a ```64x(64x26)x3```-dimensional image. Structure of the directories for above real-world fonts (including only a few observed letters) is as follows.  One can refer to the examples in ```../datasets/public_web_fonts``` for more information.
 
 ```
 ../datasets/public_web_fonts
@@ -149,10 +149,10 @@ Follow the previous steps to visualize generated images and training curves wher
 ### Citation
 If you use this code or the provided dataset for your research, please cite our paper:
 ```
-@article{azadi2017multi,
-  title={Multi-Content GAN for Few-Shot Font Style Transfer},
-  author={Azadi, Samaneh and Fisher, Matthew and Kim, Vladimir and Wang, Zhaowen and Shechtman, Eli and Darrell, Trevor},
-  journal={arXiv preprint arXiv:1712.00516},
+@article{azadi2017multi, 
+  title={Multi-Content GAN for Few-Shot Font Style Transfer}, 
+  author={Azadi, Samaneh and Fisher, Matthew and Kim, Vladimir and Wang, Zhaowen and Shechtman, Eli and Darrell, Trevor}, 
+  journal={arXiv preprint arXiv:1712.00516}, 
   year={2017}
 }
 ```

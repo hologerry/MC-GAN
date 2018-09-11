@@ -42,6 +42,7 @@ class TrainOptions(BaseOptions):
         self.parser.add_argument('--pool_size', type=int, default=50,
                                  help='the size of image buffer that stores previously generated images')
         self.parser.add_argument('--no_html', action='store_true',
-                                 help='do not save intermediate training results to [opt.checkpoints_dir]/[opt.name]/web/')
+                                 help='do not save intermediate training results to' +
+                                 '[opt.checkpoints_dir]/[opt.name]/web/')
         self.parser.add_argument('--noisy_disc', action='store_true',
                                  help='add noise to the discriminator target labels')

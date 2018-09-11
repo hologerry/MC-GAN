@@ -31,13 +31,15 @@ class BaseOptions():
         self.parser.add_argument('--which_model_netG', type=str, default='resnet_9blocks',
                                  help='selects model to use for netG')
         self.parser.add_argument('--which_model_preNet', type=str, default='none',
-                                 help='none/2_layers? selects model to use for prenetwork on top of input and prediction')
+                                 help='none/2_layers?' +
+                                 'selects model to use for prenetwork on top of input and prediction')
         self.parser.add_argument('--n_layers_D', type=int, default=3, help='only used if which_model_netD==n_layers')
-        self.parser.add_argument('--gpu_ids', type=str, default='0', help='gpu ids: e.g. 0  0,1,2, 0,2')
+        self.parser.add_argument('--gpu_ids', type=str, default='0', help='gpu ids: e.g. 0  0, 1, 2, 0, 2')
         self.parser.add_argument('--name', type=str, default='experiment_name',
                                  help='name of the experiment. It decides where to store samples and models')
         self.parser.add_argument('--align_data', action='store_true',
-                                 help='if True, the datasets are loaded from "test" and "train" directories and the data pairs are aligned')
+                                 help='if True, the datasets are loaded from "test" and "train" directories' +
+                                 'and the data pairs are aligned')
         self.parser.add_argument('--model', type=str, default='cycle_gan',
                                  help='chooses which model to use. cycle_gan, one_direction_test, pix2pix, ...')
         self.parser.add_argument('--nThreads', default=2, type=int, help='# threads for loading data')
@@ -51,7 +53,8 @@ class BaseOptions():
         self.parser.add_argument('--use_dropout', action='store_true', help='use dropout for the generator')
         self.parser.add_argument('--use_dropout1', action='store_true', help='use dropout for the generator in OrnaNet')
         self.parser.add_argument('--max_dataset_size', type=int, default=float("inf"),
-                                 help='Maximum number of samples allowed per dataset. If the dataset directory contains more than max_dataset_size, only a subset is loaded.')
+                                 help='Maximum number of samples allowed per dataset. If the dataset directory' +
+                                 'contains more than max_dataset_size, only a subset is loaded.')
         self.parser.add_argument('--conditional', action='store_true', help='feed input to the discriminator')
         self.parser.add_argument('--conv3d', action='store_true', help='separate channels by 3d convolution?')
         self.parser.add_argument('--blanks', type=float, default=0.7,
@@ -90,7 +93,7 @@ class BaseOptions():
         self.opt = self.parser.parse_args()
         self.opt.isTrain = self.isTrain  # train or test
 
-        str_ids = self.opt.gpu_ids.split(',')
+        str_ids = self.opt.gpu_ids.split(', ')
         self.opt.gpu_ids = []
         for str_id in str_ids:
             id = int(str_id)

@@ -3,9 +3,6 @@
 # plot different loss values of StackGAN_model during training from the log file
 # By Samaneh Azadi
 ################################################################################
-
-
-import os
 import numpy as np
 import argparse
 import matplotlib as mpl
@@ -39,7 +36,7 @@ def plot_loss(loss_path, lossType, col, n_avg):
             continue
         else:
             loss.append(float(line[1].split(" ")[0].strip()))
-            epochs.append(float(line[0].split("epoch: ")[1].split(",")[0].strip()))
+            epochs.append(float(line[0].split("epoch: ")[1].split(", ")[0].strip()))
     loss_avg = moving_average(loss, int(n_avg))
     return loss_avg, epochs
 
