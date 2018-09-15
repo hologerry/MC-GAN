@@ -3,17 +3,19 @@
 # Modified from https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix
 # =============================
 
-import numpy as np
-import os
 import ntpath
-import time
-from . import util
-from . import html
+import os
 import shutil
+import time
+
+import numpy as np
 from scipy import misc
 from skimage import data, img_as_float
 from skimage.measure import compare_ssim as ssim
+
 import skvideo.io
+
+from . import html, util
 
 
 class Visualizer():
@@ -50,7 +52,7 @@ class Visualizer():
             idx = 1
             for label, image_numpy in visuals.items():
                 # image_numpy = np.flipud(image_numpy)
-                self.vis.image(image_numpy.transpose([2, 0, 1]), opts=dict(title=label), 
+                self.vis.image(image_numpy.transpose([2, 0, 1]), opts=dict(title=label),
                                win=self.display_id + idx)
                 idx += 1
 
@@ -81,13 +83,13 @@ class Visualizer():
         self.plot_data['X'].append(epoch + counter_ratio)
         self.plot_data['Y'].append([errors[k] for k in self.plot_data['legend']])
         self.vis.line(
-            X=np.stack([np.array(self.plot_data['X'])] * len(self.plot_data['legend']), 1), 
-            Y=np.array(self.plot_data['Y']), 
+            X=np.stack([np.array(self.plot_data['X'])] * len(self.plot_data['legend']), 1),
+            Y=np.array(self.plot_data['Y']),
             opts={
-                'title': self.name + ' loss over time', 
-                'legend': self.plot_data['legend'], 
-                'xlabel': 'epoch', 
-                'ylabel': 'loss'}, 
+                'title': self.name + ' loss over time',
+                'legend': self.plot_data['legend'],
+                'xlabel': 'epoch',
+                'ylabel': 'loss'},
             win=self.display_id)
 
     # errors: same format as |errors| of plotCurrentErrors
@@ -165,12 +167,12 @@ class Visualizer():
                                   os.path.join(img_dir.replace("&", "\&"), im), end_, i))
                         i += 1
         os.system("ffmpeg -r 6 -f image2 -s %dx%d -i ~/tmp_ffmpeg/fake_B/im%%04d.png -vcodec libx264 -crf 25  "
-                  "-pix_fmt yuv420p %s/test_fake_B.mp4 2>&1|tee ~/tmp_ffmpeg/log2_fake_B.txt" % (img.shape[0], 
-                                                                                                 img.shape[1], 
+                  "-pix_fmt yuv420p %s/test_fake_B.mp4 2>&1|tee ~/tmp_ffmpeg/log2_fake_B.txt" % (img.shape[0],
+                                                                                                 img.shape[1],
                                                                                                  video_path.replace(
                                                                                                      "&", "\&")))
         os.system("ffmpeg -r 6 -f image2 -s %dx%d -i ~/tmp_ffmpeg/real_A/im%%04d.png -vcodec libx264 -crf 25  "
-                  "-pix_fmt yuv420p %s/test_real_A.mp4 2>&1|tee ~/tmp_ffmpeg/log2_real_A.txt" % (img.shape[0], 
-                                                                                                 img.shape[1], 
+                  "-pix_fmt yuv420p %s/test_real_A.mp4 2>&1|tee ~/tmp_ffmpeg/log2_real_A.txt" % (img.shape[0],
+                                                                                                 img.shape[1],
                                                                                                  video_path.replace(
                                                                                                      "&", "\&")))

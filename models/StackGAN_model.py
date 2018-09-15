@@ -26,12 +26,12 @@ class StackGANModel(BaseModel):
     def initialize(self, opt):
         BaseModel.initialize(self, opt)
         # define tensors
-        self.input_A0 = self.Tensor(opt.batchSize, opt.input_nc, 
+        self.input_A0 = self.Tensor(opt.batchSize, opt.input_nc,
                                     opt.fineSize, opt.fineSize)
-        self.input_B0 = self.Tensor(opt.batchSize, opt.output_nc, 
+        self.input_B0 = self.Tensor(opt.batchSize, opt.output_nc,
                                     opt.fineSize, opt.fineSize)
 
-        self.input_base = self.Tensor(opt.batchSize, opt.output_nc, 
+        self.input_base = self.Tensor(opt.batchSize, opt.output_nc,
                                       opt.fineSize, opt.fineSize)
 
         # load/define networks
@@ -40,14 +40,14 @@ class StackGANModel(BaseModel):
             self.netG_3d = networks.define_G_3d(opt.input_nc, opt.input_nc, norm=opt.norm, groups=opt.grps, gpu_ids=self.gpu_ids)
 
         # Generator of the GlyphNet
-        self.netG = networks.define_G(opt.input_nc, opt.output_nc, opt.ngf, 
+        self.netG = networks.define_G(opt.input_nc, opt.output_nc, opt.ngf,
                                       opt.which_model_netG, opt.norm, opt.use_dropout, self.gpu_ids)
 
         # Generator of the OrnaNet as an Encoder and a Decoder
-        self.netE1 = networks.define_Enc(opt.input_nc_1, opt.output_nc_1, opt.ngf, 
+        self.netE1 = networks.define_Enc(opt.input_nc_1, opt.output_nc_1, opt.ngf,
                                          opt.which_model_netG, opt.norm, opt.use_dropout1, self.gpu_ids)
 
-        self.netDE1 = networks.define_Dec(opt.input_nc_1, opt.output_nc_1, opt.ngf, 
+        self.netDE1 = networks.define_Dec(opt.input_nc_1, opt.output_nc_1, opt.ngf,
                                           opt.which_model_netG, opt.norm, opt.use_dropout1, self.gpu_ids)
 
         if self.opt.conditional:
@@ -60,7 +60,7 @@ class StackGANModel(BaseModel):
 
             netD_norm = opt.norm
 
-            self.netD1 = networks.define_D(nif, opt.ndf, opt.which_model_netD, 
+            self.netD1 = networks.define_D(nif, opt.ndf, opt.which_model_netD,
                                            opt.n_layers_D, netD_norm, use_sigmoid, True, self.gpu_ids)
 
         if self.isTrain:
@@ -71,10 +71,10 @@ class StackGANModel(BaseModel):
 
             if self.opt.print_weights:
                 for key in self.netE1.state_dict().keys():
-                    print(key, 'random_init, mean, std:', torch.mean(self.netE1.state_dict()[key]), 
+                    print(key, 'random_init, mean, std:', torch.mean(self.netE1.state_dict()[key]),
                           torch.std(self.netE1.state_dict()[key]))
                 for key in self.netDE1.state_dict().keys():
-                    print(key, 'random_init, mean, std:', torch.mean(self.netDE1.state_dict()[key]), 
+                    print(key, 'random_init, mean, std:', torch.mean(self.netDE1.state_dict()[key]),
                           torch.std(self.netDE1.state_dict()[key]))
 
         if not self.isTrain:
@@ -118,21 +118,21 @@ class StackGANModel(BaseModel):
 
             # initialize optimizers
             if self.opt.conv3d:
-                self.optimizer_G_3d = torch.optim.Adam(self.netG_3d.parameters(), 
+                self.optimizer_G_3d = torch.optim.Adam(self.netG_3d.parameters(),
                                                        lr=opt.lr, betas=(opt.beta1, 0.999))
 
-            self.optimizer_G = torch.optim.Adam(self.netG.parameters(), 
+            self.optimizer_G = torch.optim.Adam(self.netG.parameters(),
                                                 lr=opt.lr, betas=(opt.beta1, 0.999))
-            self.optimizer_E1 = torch.optim.Adam(self.netE1.parameters(), 
+            self.optimizer_E1 = torch.optim.Adam(self.netE1.parameters(),
                                                  lr=opt.lr, betas=(opt.beta1, 0.999))
             if opt.which_model_preNet != 'none':
-                self.optimizer_preA = torch.optim.Adam(self.preNet_A.parameters(), 
+                self.optimizer_preA = torch.optim.Adam(self.preNet_A.parameters(),
                                                        lr=opt.lr, betas=(opt.beta1, 0.999))
 
-            self.optimizer_DE1 = torch.optim.Adam(self.netDE1.parameters(), 
+            self.optimizer_DE1 = torch.optim.Adam(self.netDE1.parameters(),
                                                   lr=opt.lr, betas=(opt.beta1, 0.999))
 
-            self.optimizer_D1 = torch.optim.Adam(self.netD1.parameters(), 
+            self.optimizer_D1 = torch.optim.Adam(self.netD1.parameters(),
                                                  lr=opt.lr, betas=(opt.beta1, 0.999))
 
             print('---------- Networks initialized -------------')
@@ -503,12 +503,12 @@ class StackGANModel(BaseModel):
             self.optimizer_G_3d.step()
 
     def get_current_errors(self):
-        return OrderedDict([('G1_GAN', self.loss_G1_GAN.data[0]), 
-                            ('G1_L1', self.loss_G1_L1.data[0]), 
-                            ('G1_MSE_gt', self.loss_G1_MSE_gt.data[0]), 
-                            ('G1_MSE', self.loss_G1_MSE_rgb2gay.data[0]), 
-                            ('D1_real', self.loss_D1_real.data[0]), 
-                            ('D1_fake', self.loss_D1_fake.data[0]), 
+        return OrderedDict([('G1_GAN', self.loss_G1_GAN.data[0]),
+                            ('G1_L1', self.loss_G1_L1.data[0]),
+                            ('G1_MSE_gt', self.loss_G1_MSE_gt.data[0]),
+                            ('G1_MSE', self.loss_G1_MSE_rgb2gay.data[0]),
+                            ('D1_real', self.loss_D1_real.data[0]),
+                            ('D1_fake', self.loss_D1_fake.data[0]),
                             ('G_L1', self.loss_G_L1.data[0])
                             ])
 

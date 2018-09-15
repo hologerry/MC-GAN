@@ -4,22 +4,24 @@
 # By Samaneh Azadi
 # =============================
 
-from data.image_folder import ImageFolder
-from data.base_data_loader import BaseDataLoader
+import os
+import pickle
 import random
+import warnings
+from builtins import object
+
+import numpy as np
 import torch.utils.data
 import torchvision.transforms as transforms
-from builtins import object
-import os
-import numpy as np
-from torch import LongTensor, index_select  # pylint: disable=E0611
-from scipy import misc
-import util.util as util
 from PIL import Image
-from torch.nn import UpsamplingBilinear2d
+from scipy import misc
+from torch import LongTensor, index_select  # pylint: disable=E0611
 from torch.autograd import Variable
-import warnings
-import pickle
+from torch.nn import UpsamplingBilinear2d
+
+import util.util as util
+from data.base_data_loader import BaseDataLoader
+from data.image_folder import ImageFolder
 
 
 def normalize_stack(input, val=0.5):
@@ -47,7 +49,8 @@ def CreateDataLoader(opt):
 
 
 class FlatData(object):
-    def __init__(self, data_loader, data_loader_base, fineSize, max_dataset_size, rgb, dict_test={}, base_font=False, blanks=0.7):
+    def __init__(self, data_loader, data_loader_base, fineSize, max_dataset_size, rgb,
+                 dict_test={}, base_font=False, blanks=0.7):
         self.data_loader = data_loader
         self.data_loader_base = data_loader_base
         self.fineSize = fineSize
@@ -90,12 +93,15 @@ class FlatData(object):
             # randomly remove some of the glyphs
 
             if not self.dict:
-                blank_ind = np.random.permutation(A.size(3)/target_size)[0:int(self.blanks*A.size(3)/target_size)]
+                blank_ind = np.random.permutation(
+                    A.size(3)/target_size)[0:int(self.blanks*A.size(3)/target_size)]
             else:
                 file_name = map(lambda x: x.split("/")[-1], AB_paths)
-                blank_ind = self.random_dict[file_name][0:int(self.blanks*A.size(3)/target_size)]
+                blank_ind = self.random_dict[file_name][0:int(
+                    self.blanks*A.size(3)/target_size)]
 
-            blank_ind = np.tile(range(target_size), len(blank_ind)) + np.repeat(blank_ind*target_size, target_size)
+            blank_ind = np.tile(range(target_size), len(
+                blank_ind)) + np.repeat(blank_ind*target_size, target_size)
             AA.index_fill_(3, LongTensor(list(blank_ind)), 1)
             # t_topil = transforms.Compose([
             #     transforms.ToPILImage()])
@@ -144,13 +150,15 @@ class Data(object):
         else:
             # randomly remove some of the glyphs in input
             if not self.dict:
-                blank_ind = np.repeat(np.random.permutation(A.size(1)/n_rgb)[0:int(self.blanks*A.size(1)/n_rgb)], n_rgb)
+                blank_ind = np.repeat(np.random.permutation(
+                    A.size(1)/n_rgb)[0:int(self.blanks*A.size(1)/n_rgb)], n_rgb)
             else:
                 file_name = map(lambda x: x.split("/")[-1], AB_paths)
                 if len(file_name) > 1:
                     raise Exception('batch size should be 1')
                 file_name = file_name[0]  # pylint: disable=E1136
-                blank_ind = self.random_dict[file_name][0:int(self.blanks*A.size(1)/n_rgb)]
+                blank_ind = self.random_dict[file_name][0:int(
+                    self.blanks*A.size(1)/n_rgb)]
 
             rgb_inds = np.tile(range(n_rgb), int(self.blanks*A.size(1)/n_rgb))
             blank_ind = blank_ind*n_rgb + rgb_inds
@@ -161,7 +169,8 @@ class Data(object):
 
 
 class PartialData(object):
-    def __init__(self, data_loader_A, data_loader_B, data_loader_base, fineSize, loadSize, max_dataset_size, phase, base_font=False, blanks=0):
+    def __init__(self, data_loader_A, data_loader_B, data_loader_base, fineSize, loadSize,
+                 max_dataset_size, phase, base_font=False, blanks=0):
         self.data_loader_A = data_loader_A
         self.data_loader_B = data_loader_B
         self.data_loader_base = data_loader_base
@@ -223,8 +232,10 @@ class PartialData(object):
 
             # remove more of the glyphs to make prediction harder
             if self.blanks != 0:
-                gt_glyph = [int(A_paths[index].split('/')[-1].split('.png')[0].split('_')[-1])]
-                observed_glyph = list(set(np.nonzero(1-A[index, :, :, :])[:, 0]) - set(gt_glyph))
+                gt_glyph = [int(A_paths[index].split(
+                    '/')[-1].split('.png')[0].split('_')[-1])]
+                observed_glyph = list(
+                    set(np.nonzero(1-A[index, :, :, :])[:, 0]) - set(gt_glyph))
                 observed_glyph = np.random.permutation(observed_glyph)
                 blank_nums = 1
                 for i in range(blank_nums):
@@ -245,7 +256,7 @@ class StackDataLoader(BaseDataLoader):
             # TODO: Scale
             transforms.Scale(opt.loadSize),
             transforms.ToTensor(),
-                                 ])
+        ])
         dic_phase = {'train': 'Train', 'test': 'Test'}
         # Dataset A
         dataset_A = ImageFolder(root=opt.dataroot + 'A/' + opt.phase,
@@ -261,7 +272,8 @@ class StackDataLoader(BaseDataLoader):
                                 font_trans=False, no_permutation=opt.no_permutation)
 
         if len(dataset_A.imgs) != len(dataset_B.imgs):
-            raise Exception("number of images in source folder and target folder does not match")
+            raise Exception(
+                "number of images in source folder and target folder does not match")
 
         if (opt.partial and (not self.opt.serial_batches)):
             dataset_A.imgs = [dataset_A.imgs[i] for i in shuffle_inds]
@@ -298,7 +310,8 @@ class StackDataLoader(BaseDataLoader):
             data_loader_base = None
 
         self.dataset_A = dataset_A
-        self._data = PartialData(data_loader_A, data_loader_B, data_loader_base, opt.fineSize, opt.loadSize, opt.max_dataset_size, opt.phase, opt.base_font, opt.blanks)
+        self._data = PartialData(data_loader_A, data_loader_B, data_loader_base, opt.fineSize,
+                                 opt.loadSize, opt.max_dataset_size, opt.phase, opt.base_font, opt.blanks)
 
     def name(self):
         return 'StackDataLoader'
@@ -325,7 +338,7 @@ class PartialDataLoader(BaseDataLoader):
             transforms.ToTensor(),
             # transforms.Normalize((0.5, 0.5, 0.5),
             # (0.5, 0.5, 0.5))
-                                 ])
+        ])
         dic_phase = {'train': 'Train', 'test': 'Test'}
         # Dataset A
 
@@ -343,7 +356,8 @@ class PartialDataLoader(BaseDataLoader):
                                 loadSize=opt.loadSize, font_trans=False, no_permutation=opt.no_permutation)
 
         if len(dataset_A.imgs) != len(dataset_B.imgs):
-            raise Exception("number of images in source folder and target folder does not match")
+            raise Exception(
+                "number of images in source folder and target folder does not match")
 
         if (opt.partial and (not self.opt.serial_batches)):
             dataset_A.imgs = [dataset_A.imgs[i] for i in shuffle_inds]
@@ -379,7 +393,8 @@ class PartialDataLoader(BaseDataLoader):
             data_loader_base = None
 
         self.dataset_A = dataset_A
-        self._data = PartialData(data_loader_A, data_loader_B, data_loader_base, opt.fineSize, opt.loadSize, opt.max_dataset_size, opt.phase, opt.base_font)
+        self._data = PartialData(data_loader_A, data_loader_B, data_loader_base,
+                                 opt.fineSize, opt.loadSize, opt.max_dataset_size, opt.phase, opt.base_font)
 
     def name(self):
         return 'PartialDataLoader'
@@ -419,12 +434,15 @@ class DataLoader(BaseDataLoader):
             if os.path.isfile(test_dict):
                 dict_inds = pickle.load(open(test_dict))
             else:
-                warnings.warn('Blanks in test data are random. create a pkl file in ~/data_path/test_dict/dict.pkl including predifined random indices')
+                warnings.warn(
+                    'Blanks in test data are random. create a pkl file in ~/data_path/test_dict/dict.pkl including predifined random indices')
 
         if opt.flat:
-            self._data = FlatData(data_loader, data_loader_base, opt.fineSize, opt.max_dataset_size, opt.rgb, dict_inds, opt.base_font, opt.blanks)
+            self._data = FlatData(data_loader, data_loader_base, opt.fineSize,
+                                  opt.max_dataset_size, opt.rgb, dict_inds, opt.base_font, opt.blanks)
         else:
-            self._data = Data(data_loader, opt.fineSize, opt.max_dataset_size, opt.rgb, dict_inds, opt.blanks)
+            self._data = Data(data_loader, opt.fineSize,
+                              opt.max_dataset_size, opt.rgb, dict_inds, opt.blanks)
 
     def name(self):
         return 'DataLoader'

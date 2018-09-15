@@ -1,15 +1,18 @@
-#=====================================
+# =====================================
 # MC-GAN
 # from https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix
-#=====================================
+# =====================================
 
 import time
 from options.train_options import TrainOptions
-opt = TrainOptions().parse()  # set CUDA_VISIBLE_DEVICES before import torch
+# set CUDA_VISIBLE_DEVICES before import torch
 
 from models.models import create_model
 from util.visualizer import Visualizer
 from data.data_loader import CreateDataLoader
+
+
+opt = TrainOptions().parse()
 
 data_loader = CreateDataLoader(opt)
 
@@ -22,6 +25,7 @@ visualizer = Visualizer(opt)
 
 total_steps = 0
 
+
 for epoch in range(1, opt.niter + opt.niter_decay + 1):
     epoch_start_time = time.time()
     for i, data in enumerate(dataset):
@@ -32,14 +36,16 @@ for epoch in range(1, opt.niter + opt.niter_decay + 1):
         model.optimize_parameters()
 
         if total_steps % opt.display_freq == 0:
-            visualizer.display_current_results(model.get_current_visuals(), epoch)
+            visualizer.display_current_results(
+                model.get_current_visuals(), epoch)
 
         if total_steps % opt.print_freq == 0:
             errors = model.get_current_errors()
             t = (time.time() - iter_start_time) / opt.batchSize
             visualizer.print_current_errors(epoch, epoch_iter, errors, t)
             if opt.display_id > 0:
-                visualizer.plot_current_errors(epoch, float(epoch_iter)/dataset_size, opt, errors)
+                visualizer.plot_current_errors(epoch, float(
+                    epoch_iter)/dataset_size, opt, errors)
 
         if total_steps % opt.save_latest_freq == 0:
             print('saving the latest model (epoch %d, total_steps %d)' %

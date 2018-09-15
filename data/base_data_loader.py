@@ -1,6 +1,8 @@
-#=============================
+# =============================
 # From https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix
-#=============================
+# =============================
+
+
 class BaseDataLoader():
     def __init__(self):
         pass
@@ -11,6 +13,3 @@ class BaseDataLoader():
 
     def load_data():  # pylint: disable=E0211
         return None
-
-
-

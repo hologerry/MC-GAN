@@ -1,11 +1,13 @@
 from __future__ import print_function
-import torch
-import numpy as np
-from PIL import Image, ImageOps
-import inspect, re
-import numpy as np
-import os
+
 import collections
+import inspect
+import os
+import re
+
+import numpy as np
+import torch
+from PIL import Image, ImageOps
 
 
 # Converts a Tensor into a Numpy array
