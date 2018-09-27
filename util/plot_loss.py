@@ -3,12 +3,13 @@
 # plot different loss values of StackGAN_model during training from the log file
 # By Samaneh Azadi
 ################################################################################
-import numpy as np
 import argparse
+
 import matplotlib as mpl
+import matplotlib.pyplot as plt
+import numpy as np
 
 mpl.use('Agg')
-import matplotlib.pyplot as plt
 
 
 def parse_args():

@@ -62,8 +62,8 @@ def save_image(image_numpy, image_path, rgb):
 
             image_numpy_ = np.zeros((image_numpy.shape[0], image_numpy.shape[1] * n_ch / 3, 3))
             for i in range(n_ch / 3):
-                image_numpy_[:, i * image_numpy.shape[1]:(i + 1) * image_numpy.shape[1], :] = image_numpy[:, :, 
-                                                                                              i * 3:(i + 1) * 3]
+                image_numpy_[:, i * image_numpy.shape[1]:(i + 1) * image_numpy.shape[1], :] = \
+                    image_numpy[:, :, i * 3:(i + 1) * 3]
             image_numpy = image_numpy_.astype('uint8')
 
     image_pil = Image.fromarray(image_numpy)
@@ -76,7 +76,7 @@ def info(object, spacing=10, collapse=1):
     methodList = [e for e in dir(object) if isinstance(getattr(object, e), collections.Callable)]
     processFunc = collapse and (lambda s: " ".join(s.split())) or (lambda s: s)
     print("\n".join(["%s %s" %
-                     (method.ljust(spacing), 
+                     (method.ljust(spacing),
                       processFunc(str(getattr(object, method).__doc__)))
                      for method in methodList]))
 

@@ -51,7 +51,7 @@ fi
 # =======================================
 ##COPY pretrained network from its corresponding directory
 # =======================================
-model_1_pretrained="./checkpoints/GlyphNet_pretrain" 
+model_1_pretrained="./checkpoints/GlyphNet_pretrain"
 if [ ! -f "./checkpoints/${experiment_dir}/400_net_G.pth" ]; then
     cp "${model_1_pretrained}/400_net_G.pth" "./checkpoints/${experiment_dir}/"
     cp "${model_1_pretrained}/400_net_G_3d.pth" "./checkpoints/${experiment_dir}/"
@@ -63,7 +63,7 @@ exec &> >(tee -a "$LOG")
 # =======================================
 ## Train End-2-End model
 # =======================================
-echo "TRAIN MODEL WITH REAL TRAINING DATA" 
+echo "TRAIN MODEL WITH REAL TRAINING DATA"
 
 CUDA_VISIBLE_DEVICES=${CUDA_ID} python train_Stack.py --dataroot ${DATASET}  --name ${NAME} --model ${MODEL}\
 							  --which_model_netG ${MODEL_G} --which_model_netD ${MODEL_D} --n_layers_D ${n_layers_D} --grps ${GRP} \
@@ -71,18 +71,18 @@ CUDA_VISIBLE_DEVICES=${CUDA_ID} python train_Stack.py --dataroot ${DATASET}  --n
 							  --which_model_preNet ${PRENET} --fineSize ${FINESIZE} --loadSize ${LOADSIZE} --lambda_A ${LAM_A}\
 							  --lambda_C ${LAM_C} --align_data --use_dropout --display_id 0 --niter ${NITER} --niter_decay ${NITERD}\
 							  --batchSize ${BATCHSIZE} --conditional --save_epoch_freq 100 --rgb_out --partial --which_epoch ${EPOCH} \
-							  --display_freq 5 --print_freq 5 --blanks 0 --conv3d --base_font --base_root ${base_dir} #--gpu_ids 0, 1 
+							  --display_freq 5 --print_freq 5 --blanks 0 --conv3d --base_font --base_root ${base_dir} #--gpu_ids 0, 1
 
 
 # =======================================
 ## BASELINE: train only the second network on top of clean b/w glyphs
 # =======================================
 
-# CUDA_VISIBLE_DEVICES=${CUDA_ID} python train_Stack.py --dataroot ${DATASET}  --name ${NAME} --model ${MODEL}  
+# CUDA_VISIBLE_DEVICES=${CUDA_ID} python train_Stack.py --dataroot ${DATASET}  --name ${NAME} --model ${MODEL}
                                 # --which_model_netG ${MODEL_G} --which_model_netD ${MODEL_D} --n_layers_D ${n_layers_D} --norm ${NORM}
-                                # --input_nc ${IN_NC} --output_nc ${O_NC} --input_nc_1 ${IN_NC_1} --output_nc_1 ${O_NC_1} 
-                                # --which_model_preNet ${PRENET} --fineSize ${FINESIZE} --loadSize ${LOADSIZE} --lambda_A ${LAM_A} 
-                                # --lambda_C ${LAM_C} --align_data --use_dropout --display_id 0 --niter ${NITER} --niter_decay ${NITERD} 
+                                # --input_nc ${IN_NC} --output_nc ${O_NC} --input_nc_1 ${IN_NC_1} --output_nc_1 ${O_NC_1}
+                                # --which_model_preNet ${PRENET} --fineSize ${FINESIZE} --loadSize ${LOADSIZE} --lambda_A ${LAM_A}
+                                # --lambda_C ${LAM_C} --align_data --use_dropout --display_id 0 --niter ${NITER} --niter_decay ${NITERD}
                                 # --batchSize ${BATCHSIZE} --conditional --save_epoch_freq 100 --rgb_out --partial --which_epoch ${EPOCH}
                                 # --display_freq 5 --print_freq 5 --blanks 0 --base_font --conv3d --no_Style2Glyph --orna
 

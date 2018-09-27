@@ -39,7 +39,7 @@ LOG="./checkpoints/${experiment_dir}/output.txt"
 if [ -f $LOG ]; then
 	rm $LOG
 fi
- 
+
 
 
 exec &> >(tee -a "$LOG")

@@ -37,18 +37,18 @@ CUDA_ID=0
 if [ ! -d "./checkpoints/${experiment_dir}" ]; then
 	mkdir "./checkpoints/${experiment_dir}"
 fi
- 
+
 # =======================================
 ##COPY pretrained network from its corresponding directory
 # =======================================
 
-model_1_pretrained="./checkpoints/GlyphNet_pretrain" 
+model_1_pretrained="./checkpoints/GlyphNet_pretrain"
 if [ ! -f "./checkpoints/${experiment_dir}/400_net_G.pth" ]; then
     cp "${model_1_pretrained}/400_net_G.pth" "./checkpoints/${experiment_dir}/"
     cp "${model_1_pretrained}/400_net_G_3d.pth" "./checkpoints/${experiment_dir}/"
 fi
 
- 
+
 
 # =======================================
 ## Make a video by testing model on different training epochs
