@@ -151,7 +151,7 @@ class Data(object):
             # randomly remove some of the glyphs in input
             if not self.dict:
                 blank_ind = np.repeat(np.random.permutation(
-                    A.size(1)/n_rgb)[0:int(self.blanks*A.size(1)/n_rgb)], n_rgb)
+                    A.size(1)//n_rgb)[0:int(self.blanks*A.size(1)//n_rgb)], n_rgb)
             else:
                 file_name = map(lambda x: x.split("/")[-1], AB_paths)
                 if len(file_name) > 1:
@@ -214,7 +214,7 @@ class PartialData(object):
         t_topil = transforms.Compose([
             transforms.ToPILImage()])
         t_scale = transforms.Compose([
-            transforms.Scale(self.loadSize),
+            transforms.Resize(self.loadSize),
             transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5),
                                  (0.5, 0.5, 0.5))])
@@ -254,7 +254,7 @@ class StackDataLoader(BaseDataLoader):
         BaseDataLoader.initialize(self, opt)
         transform = transforms.Compose([
             # TODO: Scale
-            transforms.Scale(opt.loadSize),
+            transforms.Resize(opt.loadSize),
             transforms.ToTensor(),
         ])
         dic_phase = {'train': 'Train', 'test': 'Test'}
@@ -334,7 +334,7 @@ class PartialDataLoader(BaseDataLoader):
         BaseDataLoader.initialize(self, opt)
         transform = transforms.Compose([
             # TODO: Scale
-            transforms.Scale(opt.loadSize),
+            transforms.Resize(opt.loadSize),
             transforms.ToTensor(),
             # transforms.Normalize((0.5, 0.5, 0.5),
             # (0.5, 0.5, 0.5))
@@ -413,7 +413,7 @@ class DataLoader(BaseDataLoader):
         self.fineSize = opt.fineSize
         transform = transforms.Compose([
             # TODO: Scale
-            transforms.Scale(opt.loadSize),
+            transforms.Resize(opt.loadSize),
             transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5),
                                  (0.5, 0.5, 0.5))])

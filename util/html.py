@@ -12,8 +12,6 @@ from dominate.tags import (a, h3, meta, p, table, td, tr, br, img)
 
 reload(sys)
 
-sys.setdefaultencoding('utf8')
-
 
 class HTML:
     def __init__(self, web_dir, title, reflesh=0):
