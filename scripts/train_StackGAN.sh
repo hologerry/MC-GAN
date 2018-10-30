@@ -38,7 +38,6 @@ BATCHSIZE=8
 EPOCH=400
 EPOCH1=$(($NITER+$NITERD))
 CUDA_ID=0
-CUDA_ID=$2
 DISPLAY_ID=999
 
 
@@ -71,7 +70,7 @@ CUDA_VISIBLE_DEVICES=${CUDA_ID} python train_Stack.py --dataroot ${DATASET}  --n
 							  --which_model_netG ${MODEL_G} --which_model_netD ${MODEL_D} --n_layers_D ${n_layers_D} --grps ${GRP} \
 							  --norm ${NORM} --input_nc ${IN_NC} --output_nc ${O_NC} --input_nc_1 ${IN_NC_1} --output_nc_1 ${O_NC_1}\
 							  --which_model_preNet ${PRENET} --fineSize ${FINESIZE} --loadSize ${LOADSIZE} --lambda_A ${LAM_A}\
-							  --lambda_C ${LAM_C} --align_data --use_dropout --display_id 0 --niter ${NITER} --niter_decay ${NITERD}\
+							  --lambda_C ${LAM_C} --align_data --use_dropout --display_id ${DISPLAY_ID} --niter ${NITER} --niter_decay ${NITERD}\
 							  --batchSize ${BATCHSIZE} --conditional --save_epoch_freq 100 --rgb_out --partial --which_epoch ${EPOCH} \
 							  --display_freq 5 --print_freq 5 --blanks 0 --conv3d --base_font --base_root ${base_dir} #--gpu_ids 0, 1
 

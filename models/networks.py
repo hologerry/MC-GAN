@@ -6,7 +6,6 @@
 
 import torch
 import torch.nn as nn
-from torch.autograd import Variable
 import numpy as np
 import functools
 
@@ -241,14 +240,14 @@ class GANLoss(nn.Module):
                             (self.real_label_var.numel() != input.numel()))
             if create_label:
                 real_tensor = self.Tensor(input.size()).fill_(self.real_label)
-                self.real_label_var = Variable(real_tensor, requires_grad=False)
+                self.real_label_var = torch.tensor(real_tensor, requires_grad=False)
             target_tensor = self.real_label_var
         else:
             create_label = ((self.fake_label_var is None) or
                             (self.fake_label_var.numel() != input.numel()))
             if create_label:
                 fake_tensor = self.Tensor(input.size()).fill_(self.fake_label)
-                self.fake_label_var = Variable(fake_tensor, requires_grad=False)
+                self.fake_label_var = torch.tensor(fake_tensor, requires_grad=False)
             target_tensor = self.fake_label_var
         return target_tensor
 
@@ -326,6 +325,21 @@ class ResnetDecoder(nn.Module):
             return nn.parallel.data_parallel(self.model, input, self.gpu_ids)
         else:
             return self.model(input)
+
+
+class UnetGenerator(nn.module):
+    def __init__(self, input_nc, output_nc, n_blocks, ngf, norm_layer, use_dropout, gpu_ids):
+        pass
+
+
+class UnetEncoder(nn.module):
+    def __init__(self, input_nc, output_nc, n_blocks, ngf, norm_layer, use_dropout, gpu_ids):
+        pass
+
+
+class UnetDecoder(nn.module):
+    def __init__(self, input_nc, output_nc, n_blocks, ngf, norm_layer, use_dropout, gpu_ids):
+        pass
 
 
 # Defines the encoder that consists of Resnet blocks between a few

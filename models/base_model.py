@@ -75,7 +75,7 @@ class BaseModel():
         network1.load_state_dict(weights1)
         weights2 = {}
 
-        keys2 = network2.state_dict().keys()
+        network2.state_dict().keys()
         keys2_in_weights = list(set(weights.keys())-set(keys1))
         keys1_last_lyr_number = max([int(key.split(".")[1]) for key in keys1])
         for old_key in keys2_in_weights:

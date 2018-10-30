@@ -96,7 +96,7 @@ class FlatData(object):
 
             blank_ind = np.tile(range(target_size), len(
                 blank_ind)) + np.repeat(blank_ind*target_size, target_size)
-            AA.index_fill_(3, LongTensor(list(blank_ind)), 1)
+            AA.index_fill_(3, torch.tensor(list(blank_ind), dtype=torch.long), 1)
             # t_topil = transforms.Compose([
             #     transforms.ToPILImage()])
 
@@ -183,10 +183,8 @@ class PartialData(object):
             self.A_base = []
         self.phase = phase
         if self.phase == 'train':
-            t_tensor = transforms.Compose([
-                transforms.ToTensor(), ])
-            t_topil = transforms.Compose([
-                transforms.ToPILImage()])
+            t_tensor = transforms.Compose([transforms.ToTensor()])
+            t_topil = transforms.Compose([transforms.ToPILImage()])
 
             if self.base_font:
                 for ind in range(self.A_base.size(1)):

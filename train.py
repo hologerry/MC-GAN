@@ -5,7 +5,6 @@
 
 import time
 from options.train_options import TrainOptions
-# set CUDA_VISIBLE_DEVICES before import torch
 
 from models.models import create_model
 from util.visualizer import Visualizer

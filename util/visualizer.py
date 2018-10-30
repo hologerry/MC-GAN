@@ -6,11 +6,9 @@
 import ntpath
 import os
 import shutil
-import time
 
 import numpy as np
 from scipy import misc
-from skimage import data, img_as_float
 from skimage.measure import compare_ssim as ssim
 
 

@@ -1,12 +1,12 @@
-import time
 import os
-from options.test_options import TestOptions
+
 import numpy as np
+
 from data.data_loader import CreateDataLoader
 from models.models import create_model
-from util.visualizer import Visualizer
-from pdb import set_trace as st
+from options.test_options import TestOptions
 from util import html
+from util.visualizer import Visualizer
 
 opt = TestOptions().parse()  # set CUDA_VISIBLE_DEVICES before import torch
 opt.nThreads = 1   # test code only supports nThreads=1
@@ -26,7 +26,8 @@ for epoch in epoch_list:
     model = create_model(opt)
     # create website
     web_dir = os.path.join(opt.results_dir, opt.name, '%s_%s' % (opt.phase, opt.which_epoch+'+'+str(epoch)))
-    webpage = html.HTML(web_dir, 'Experiment = %s, Phase = %s, Epoch = %s' % (opt.name, opt.phase, opt.which_epoch+'+'+str(epoch)))
+    webpage = html.HTML(web_dir, 'Experiment = %s, Phase = %s, Epoch = %s'
+                        % (opt.name, opt.phase, opt.which_epoch+'+'+str(epoch)))
     # test
     for i, data in enumerate(dataset):
         if i >= opt.how_many:
@@ -45,4 +46,3 @@ print("save to:%s" % video_path)
 if not os.path.isdir(video_path):
     os.mkdir(video_path)
 visualizer.save_video(video_path)
-

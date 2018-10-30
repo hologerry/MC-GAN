@@ -8,7 +8,6 @@ import random
 from collections import OrderedDict
 
 import torch
-from torch.autograd import Variable
 
 import util.util as util
 from util.image_pool import ImagePool
@@ -98,21 +97,23 @@ class cGANModel(BaseModel):
     def set_input(self, input):
         input_A = input['A']
         input_B = input['B']
+        print("input_A: ", input_A.size())
+        print("input_B: ", input_B.size())
         self.input_A.resize_(input_A.size()).copy_(input_A)
         self.input_B.resize_(input_B.size()).copy_(input_B)
         self.image_paths = input['A_paths']
 
     def forward(self):
-        self.real_A = Variable(self.input_A)
+        self.real_A = self.input_A
         if self.opt.conv3d:
             self.real_A_indep = self.netG_3d.forward(self.real_A.unsqueeze(2))
             self.fake_B = self.netG.forward(self.real_A_indep.squeeze(2))
         else:
             self.fake_B = self.netG.forward(self.real_A)
 
-        self.real_B = Variable(self.input_B)
-        real_B = util.tensor2im(self.real_B.data)
-        real_A = util.tensor2im(self.real_A.data)
+        self.real_B = self.input_B
+        # real_B = util.tensor2im(self.real_B.data)
+        # real_A = util.tensor2im(self.real_A.data)
 
     def add_noise_disc(self, real):
         # add noise to the discriminator target labels
@@ -129,15 +130,16 @@ class cGANModel(BaseModel):
 
     # no backprop gradients
     def test(self):
-        self.real_A = Variable(self.input_A, volatile=True)
-        if self.opt.conv3d:
-            self.real_A_indep = self.netG_3d.forward(self.real_A.unsqueeze(2))
-            self.fake_B = self.netG.forward(self.real_A_indep.squeeze(2))
+        with torch.no_grad():
+            self.real_A = self.input_A
+            if self.opt.conv3d:
+                self.real_A_indep = self.netG_3d.forward(self.real_A.unsqueeze(2))
+                self.fake_B = self.netG.forward(self.real_A_indep.squeeze(2))
 
-        else:
-            self.fake_B = self.netG.forward(self.real_A)
+            else:
+                self.fake_B = self.netG.forward(self.real_A)
 
-        self.real_B = Variable(self.input_B, volatile=True)
+            self.real_B = self.input_B
 
     # get image paths
     def get_image_paths(self):
@@ -149,7 +151,7 @@ class cGANModel(BaseModel):
         label_fake = self.add_noise_disc(False)
 
         b, c, m, n = self.fake_B.size()
-        rgb = 3 if self.opt.rgb else 1
+        # rgb = 3 if self.opt.rgb else 1
 
         self.fake_B_reshaped = self.fake_B
         self.real_A_reshaped = self.real_A

@@ -4,19 +4,18 @@
 # By Samaneh Azadi
 # ==================================
 
+import random
+from collections import OrderedDict
+
 import numpy as np
 import torch
-import os
-from collections import OrderedDict
-from torch.autograd import Variable
+from torch import LongTensor, index_select
+
 import util.util as util
 from util.image_pool import ImagePool
-from .base_model import BaseModel
+
 from . import networks
-from scipy import misc
-from torch import index_select, LongTensor
-import random
-import torchvision.transforms as transforms
+from .base_model import BaseModel
 
 
 class StackGANModel(BaseModel):
@@ -37,7 +36,8 @@ class StackGANModel(BaseModel):
         # load/define networks
         if self.opt.conv3d:
             # one layer for considering a conv filter for each of the 26 channels
-            self.netG_3d = networks.define_G_3d(opt.input_nc, opt.input_nc, norm=opt.norm, groups=opt.grps, gpu_ids=self.gpu_ids)
+            self.netG_3d = networks.define_G_3d(opt.input_nc, opt.input_nc, norm=opt.norm,
+                                                groups=opt.grps, gpu_ids=self.gpu_ids)
 
         # Generator of the GlyphNet
         self.netG = networks.define_G(opt.input_nc, opt.output_nc, opt.ngf,
@@ -54,7 +54,10 @@ class StackGANModel(BaseModel):
             # not applicable for non-conditional case
             use_sigmoid = opt.no_lsgan
             if opt.which_model_preNet != 'none':
-                self.preNet_A = networks.define_preNet(self.opt.input_nc_1+self.opt.output_nc_1, self.opt.input_nc_1+self.opt.output_nc_1, which_model_preNet=opt.which_model_preNet, norm=opt.norm, gpu_ids=self.gpu_ids)
+                self.preNet_A = networks.define_preNet(self.opt.input_nc_1+self.opt.output_nc_1,
+                                                       self.opt.input_nc_1+self.opt.output_nc_1,
+                                                       which_model_preNet=opt.which_model_preNet,
+                                                       norm=opt.norm, gpu_ids=self.gpu_ids)
 
             nif = opt.input_nc_1+opt.output_nc_1
 
@@ -169,7 +172,7 @@ class StackGANModel(BaseModel):
                     real_base[batch, 1, :, :] = self.input_base[0, batch, :, :]
                     real_base[batch, 2, :, :] = self.input_base[0, batch, :, :]
 
-            self.real_base = Variable(real_base, requires_grad=False)
+            self.real_base = torch.tensor(real_base, requires_grad=False)
 
         if self.opt.isTrain:
 
@@ -200,7 +203,7 @@ class StackGANModel(BaseModel):
         return tensor_gt
 
     def forward0(self):
-        self.real_A0 = Variable(self.input_A0)
+        self.real_A0 = torch.tensor(self.input_A0)
         if self.opt.conv3d:
             self.real_A0_indep = self.netG_3d.forward(self.real_A0.unsqueeze(2))
             self.fake_B0 = self.netG.forward(self.real_A0_indep.squeeze(2))
@@ -233,17 +236,17 @@ class StackGANModel(BaseModel):
                 real_A1[batch, :, :, :] = inp_orna.data[batch, self.out_id[batch]*np.array(self.opt.input_nc_1):
                                                         (self.out_id[batch]+1)*np.array(self.opt.input_nc_1), :, :]
         if self.initial:
-            self.real_A1_init = Variable(real_A1, requires_grad=False)
+            self.real_A1_init = torch.tensor(real_A1, requires_grad=False)
             self.initial = False
 
-        self.real_A1_s = Variable(real_A1, requires_grad=inp_grad)
+        self.real_A1_s = torch.tensor(real_A1, requires_grad=inp_grad)
         self.real_A1 = self.real_A1_s
 
         self.fake_B1_emb = self.netE1.forward(self.real_A1)
         self.fake_B1 = self.netDE1.forward(self.fake_B1_emb)
-        self.real_B1 = Variable(self.input_B0)
+        self.real_B1 = torch.tensor(self.input_B0)
 
-        self.real_A1_gt_s = Variable(self.all2observed(inp_orna), requires_grad=True)
+        self.real_A1_gt_s = torch.tensor(self.all2observed(inp_orna), requires_grad=True)
         self.real_A1_gt = (self.real_A1_gt_s)
 
         self.fake_B1_gt_emb = self.netE1.forward(self.real_A1_gt)
@@ -253,7 +256,7 @@ class StackGANModel(BaseModel):
 
         if self.opt.base_font:
             real_base_gt = index_select(self.real_base, 0, obs_)
-            self.real_base_gt = (Variable(real_base_gt.data, requires_grad=False))
+            self.real_base_gt = (torch.tensor(real_base_gt.data, requires_grad=False))
 
     def add_noise_disc(self, real):
         # add noise to the discriminator target labels
@@ -270,43 +273,44 @@ class StackGANModel(BaseModel):
 
     # no backprop gradients
     def test(self):
-        self.real_A0 = Variable(self.input_A0, volatile=True)
+        with torch.no_grad():
+            self.real_A0 = self.input_A0
 
-        if self.opt.conv3d:
-            self.real_A0_indep = self.netG_3d.forward(self.real_A0.unsqueeze(2))
-            self.fake_B0 = self.netG.forward(self.real_A0_indep.squeeze(2))
-        else:
-            self.fake_B0 = self.netG.forward(self.real_A0)
-
-        b, c, m, n = self.fake_B0.size()
-
-        # for test time: we need to generate output for all of the glyphs in each input image
-        if self.opt.rgb_in:
-            self.batch_ = c/self.opt.input_nc_1
-        else:
-            self.batch_ = c
-        self.out_id = range(self.batch_)
-        real_A1 = self.Tensor(self.batch_, self.opt.input_nc_1, m, n)
-
-        if self.opt.orna:
-            inp_orna = self.real_A0
-        else:
-            inp_orna = self.fake_B0
-        for batch in range(self.batch_):
-            if not self.opt.rgb_in and self.opt.rgb_out:
-                real_A1[batch, 0, :, :] = inp_orna.data[:, self.out_id[batch], :, :]
-                real_A1[batch, 1, :, :] = inp_orna.data[:, self.out_id[batch], :, :]
-                real_A1[batch, 2, :, :] = inp_orna.data[:, self.out_id[batch], :, :]
+            if self.opt.conv3d:
+                self.real_A0_indep = self.netG_3d.forward(self.real_A0.unsqueeze(2))
+                self.fake_B0 = self.netG.forward(self.real_A0_indep.squeeze(2))
             else:
-                real_A1[batch, :, :, :] = inp_orna.data[:, self.out_id[batch]*np.array(self.opt.input_nc_1):
-                                                        (self.out_id[batch]+1)*np.array(self.opt.input_nc_1), :, :]
+                self.fake_B0 = self.netG.forward(self.real_A0)
 
-        self.real_A1 = Variable(real_A1, volatile=True)
+            b, c, m, n = self.fake_B0.size()
 
-        fake_B1_emb = self.netE1.forward(self.real_A1.detach())
-        self.fake_B1 = self.netDE1.forward(fake_B1_emb)
+            # for test time: we need to generate output for all of the glyphs in each input image
+            if self.opt.rgb_in:
+                self.batch_ = c/self.opt.input_nc_1
+            else:
+                self.batch_ = c
+            self.out_id = range(self.batch_)
+            real_A1 = self.Tensor(self.batch_, self.opt.input_nc_1, m, n)
 
-        self.real_B1 = Variable(self.input_B0, volatile=True)
+            if self.opt.orna:
+                inp_orna = self.real_A0
+            else:
+                inp_orna = self.fake_B0
+            for batch in range(self.batch_):
+                if not self.opt.rgb_in and self.opt.rgb_out:
+                    real_A1[batch, 0, :, :] = inp_orna.data[:, self.out_id[batch], :, :]
+                    real_A1[batch, 1, :, :] = inp_orna.data[:, self.out_id[batch], :, :]
+                    real_A1[batch, 2, :, :] = inp_orna.data[:, self.out_id[batch], :, :]
+                else:
+                    real_A1[batch, :, :, :] = inp_orna.data[:, self.out_id[batch]*np.array(self.opt.input_nc_1):
+                                                            (self.out_id[batch]+1)*np.array(self.opt.input_nc_1), :, :]
+
+            self.real_A1 = real_A1
+
+            fake_B1_emb = self.netE1.forward(self.real_A1.detach())
+            self.fake_B1 = self.netDE1.forward(fake_B1_emb)
+
+            self.real_B1 = self.input_B0
 
     # get image paths
     def get_image_paths(self):
@@ -318,8 +322,8 @@ class StackGANModel(BaseModel):
                 self.first_pair = self.real_base
                 self.first_pair_gt = self.real_base_gt
             else:
-                self.first_pair = Variable(self.real_A1.data, requires_grad=False)
-                self.first_pair_gt = Variable(self.real_A1_gt.data, requires_grad=False)
+                self.first_pair = torch.tensor(self.real_A1.data, requires_grad=False)
+                self.first_pair_gt = torch.tensor(self.real_A1_gt.data, requires_grad=False)
 
     def backward_D1(self):
         b, c, m, n = self.fake_B1.size()
@@ -366,7 +370,7 @@ class StackGANModel(BaseModel):
 
         b, c, m, n = self.fake_B0.size()
         if not self.opt.lambda_C or (iter > 700):
-            self.loss_G_L1 = Variable(torch.zeros(1))
+            self.loss_G_L1 = torch.tensor(torch.zeros(1))
 
         else:
             weight_val = 10.0
@@ -374,7 +378,7 @@ class StackGANModel(BaseModel):
             weights = torch.ones(b, c, m, n).cuda() if self.opt.gpu_ids else torch.ones(b, c, m, n)
             obs_ = torch.cuda.LongTensor(self.obs) if self.opt.gpu_ids else LongTensor(self.obs)
             weights.index_fill_(1, obs_, weight_val)
-            weights = Variable(weights, requires_grad=False)
+            weights = torch.tensor(weights, requires_grad=False)
 
             self.loss_G_L1 = self.criterionL1(weights * self.fake_B0, weights * self.fake_B0_init.detach()) * \
                 self.opt.lambda_C
@@ -420,11 +424,11 @@ class StackGANModel(BaseModel):
         if (iter % rate_gen) == 0:
             self.loss_G1 = self.loss_G1_GAN + self.loss_G1_L1 + self.loss_G1_MSE_gt
             G1_L1_update = True
-            G1_GAN_update = True
+            # G1_GAN_update = True
         else:
             self.loss_G1 = self.loss_G1_L1 + self.loss_G1_MSE_gt
             G1_L1_update = True
-            G1_GAN_update = False
+            # G1_GAN_update = False
 
         if (iter < 200):
             self.loss_G1 += self.loss_G1_MSE_rgb2gay
@@ -458,7 +462,7 @@ class StackGANModel(BaseModel):
         self.optimizer_DE1.step()
         self.optimizer_E1.step()
 
-        self.loss_G_L1 = Variable(torch.zeros(1))
+        self.loss_G_L1 = torch.tensor(torch.zeros(1))
 
     def optimize_parameters_Stacked(self, iter):
         self.forward0()
