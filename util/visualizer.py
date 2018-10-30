@@ -13,7 +13,6 @@ from scipy import misc
 from skimage import data, img_as_float
 from skimage.measure import compare_ssim as ssim
 
-import skvideo.io
 
 from . import html, util
 
@@ -29,7 +28,7 @@ class Visualizer():
         self.video_dir = []
         if self.display_id > 0:
             import visdom
-            self.vis = visdom.Visdom()
+            self.vis = visdom.Visdom(server=opt.display_server, port=opt.display_port)
 
         if self.use_html:
             self.web_dir = os.path.join(opt.checkpoints_dir, opt.name, 'web')
@@ -41,8 +40,8 @@ class Visualizer():
         fake_B = visuals['fake_B'].copy()
         real_B = visuals['real_B'].copy()
         ssim_score = ssim(fake_B, real_B, data_range=real_B.max() - real_B.min())
-        fake_B /= real_B.max()
-        real_B /= real_B.max()
+        fake_B = fake_B / real_B.max()
+        real_B = real_B / real_B.max()
         mse_score = np.mean((fake_B - real_B) ** 2)
         return ssim_score, mse_score
 

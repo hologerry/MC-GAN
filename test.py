@@ -4,7 +4,6 @@
 # By Samaneh Azadi
 # =====================================
 
-
 import time
 import os
 from options.test_options import TestOptions

@@ -34,7 +34,7 @@ class BaseOptions():
                                  help='none/2_layers?' +
                                  'selects model to use for prenetwork on top of input and prediction')
         self.parser.add_argument('--n_layers_D', type=int, default=3, help='only used if which_model_netD==n_layers')
-        self.parser.add_argument('--gpu_ids', type=str, default='0, 1, 2', help='gpu ids: e.g. 0  0, 1, 2, 0, 2')
+        self.parser.add_argument('--gpu_ids', type=str, default='0,1,2', help='gpu ids: e.g. 0  0, 1, 2, 0, 2')
         self.parser.add_argument('--name', type=str, default='experiment_name',
                                  help='name of the experiment. It decides where to store samples and models')
         self.parser.add_argument('--align_data', action='store_true',
@@ -42,7 +42,7 @@ class BaseOptions():
                                  'and the data pairs are aligned')
         self.parser.add_argument('--model', type=str, default='cycle_gan',
                                  help='chooses which model to use. cycle_gan, one_direction_test, pix2pix, ...')
-        self.parser.add_argument('--nThreads', default=2, type=int, help='# threads for loading data')
+        self.parser.add_argument('--nThreads', default=16, type=int, help='# threads for loading data')
         self.parser.add_argument('--checkpoints_dir', type=str, default='./checkpoints', help='models are saved here')
         self.parser.add_argument('--norm', type=str, default='instance',
                                  help='instance normalization or batch normalization')
@@ -50,6 +50,8 @@ class BaseOptions():
                                  help='if true, takes images in order to make batches, otherwise takes them randomly')
         self.parser.add_argument('--display_winsize', type=int, default=256, help='display window size')
         self.parser.add_argument('--display_id', type=int, default=1, help='window id of the web display')
+        self.parser.add_argument('--display_port', type=int, default=9099, help='visdom display port')
+        self.parser.add_argument('--display_server', type=str, default="http://localhost", help='visdom server of the web display')
         self.parser.add_argument('--use_dropout', action='store_true', help='use dropout for the generator')
         self.parser.add_argument('--use_dropout1', action='store_true', help='use dropout for the generator in OrnaNet')
         self.parser.add_argument('--max_dataset_size', type=int, default=float("inf"),

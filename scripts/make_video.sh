@@ -11,7 +11,7 @@
 ## Set Parameters
 #=====================================
 DATA=$1
-DATASET="../datasets/public_web_fonts/${DATA}/"
+DATASET="../datasets/public_web_fonts/${DATA}"
 base_dir="../datasets/Capitals64/BASE"
 experiment_dir="${DATA}_MCGAN_train"
 NAME="${experiment_dir}"

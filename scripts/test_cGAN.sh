@@ -12,7 +12,7 @@
 #=====================================
 
 DATA=$1
-DATASET="../datasets/${DATA}/"
+DATASET="../datasets/${DATA}"
 experiment_dir="GlyphNet_pretrain"
 MODEL=cGAN
 MODEL_G=resnet_6blocks
@@ -31,6 +31,7 @@ NITERD=100
 BATCHSIZE=150
 EPOCH=400 #test at which epoch?
 CUDA_ID=0
+DISPLAY_ID=999
 
 if [ ! -d "./checkpoints/${experiment_dir}" ]; then
 	mkdir "./checkpoints/${experiment_dir}"
@@ -45,7 +46,8 @@ exec &> >(tee -a "$LOG")
 # =======================================
 ## Test Glyph Network on font dataset
 # =======================================
-CUDA_VISIBLE_DEVICES=${CUDA_ID} python test.py --dataroot ${DATASET} --name "${experiment_dir}"\
+CUDA_VISIBLE_DEVICES=${CUDA_ID}
+python test.py --dataroot ${DATASET} --name "${experiment_dir}"\
 							 	--model ${MODEL} --which_model_netG ${MODEL_G} --which_model_netD ${MODEL_D} --n_layers_D ${n_layers_D} --which_model_preNet ${PRENET}\
 							 	--norm ${NORM} --input_nc ${IN_NC} --output_nc ${O_NC} --grps ${GRP}  --loadSize ${FINESIZE} --fineSize ${LOADSIZE} --display_id 0 --batchSize 1 --conditional\
 							 	--which_epoch ${EPOCH} --blanks 0.75 --conv3d --align_data

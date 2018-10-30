@@ -6,14 +6,12 @@
 
 import os
 import os.path
-import random
 
 import numpy as np
 import torch
 import torch.utils.data as data
 from PIL import Image
-from scipy import misc
-from torch import LongTensor, index_select, transpose  # pylint: disable=E0611
+from torch import index_select
 
 from options.train_options import TrainOptions
 
@@ -61,7 +59,8 @@ def font_transform(img, path, rgb_in):
     for j in range(target_size):
         for i in np.arange(0, D_):
             slices += list(target_size * np.arange(i, D_*n_rgb, D_) + j)
-    img = index_select(img, 2, LongTensor(slices)).view(
+    slices = np.array(slices)
+    img = index_select(img, 2, torch.from_numpy(slices)).view(
         target_size, target_size, D_*n_rgb)
     img = img.permute(2, 0, 1)
     return img

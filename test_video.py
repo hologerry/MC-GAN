@@ -10,8 +10,8 @@ from util import html
 
 opt = TestOptions().parse()  # set CUDA_VISIBLE_DEVICES before import torch
 opt.nThreads = 1   # test code only supports nThreads=1
-opt.batchSize = 1  #test code only supports batchSize=1
-opt.serial_batches = True # no shuffle
+opt.batchSize = 1  # test code only supports batchSize=1
+opt.serial_batches = True  # no shuffle
 opt.stack = True
 opt.use_dropout = False
 opt.use_dropout1 = False

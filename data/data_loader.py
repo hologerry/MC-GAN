@@ -13,13 +13,7 @@ from builtins import object
 import numpy as np
 import torch.utils.data
 import torchvision.transforms as transforms
-from PIL import Image
-from scipy import misc
-from torch import LongTensor, index_select  # pylint: disable=E0611
-from torch.autograd import Variable
-from torch.nn import UpsamplingBilinear2d
 
-import util.util as util
 from data.base_data_loader import BaseDataLoader
 from data.image_folder import ImageFolder
 
@@ -153,8 +147,8 @@ class Data(object):
                 blank_ind = np.repeat(np.random.permutation(
                     A.size(1)//n_rgb)[0:int(self.blanks*A.size(1)//n_rgb)], n_rgb)
             else:
-                file_name = map(lambda x: x.split("/")[-1], AB_paths)
-                if len(file_name) > 1:
+                file_name = list(map(lambda x: x.split("/")[-1], AB_paths))
+                if len(file_name) != 1:
                     raise Exception('batch size should be 1')
                 file_name = file_name[0]  # pylint: disable=E1136
                 blank_ind = self.random_dict[file_name][0:int(
@@ -163,7 +157,8 @@ class Data(object):
             rgb_inds = np.tile(range(n_rgb), int(self.blanks*A.size(1)/n_rgb))
             blank_ind = blank_ind*n_rgb + rgb_inds
             AA = A.clone()
-            AA.index_fill_(1, LongTensor(list(blank_ind)), 1)
+            blank_ind = np.array(blank_ind)
+            AA.index_fill_(1, torch.from_numpy(blank_ind), 1)
 
         return {'A': AA, 'A_paths': AB_paths, 'B': B, 'B_paths': AB_paths}
 
@@ -259,14 +254,14 @@ class StackDataLoader(BaseDataLoader):
         ])
         dic_phase = {'train': 'Train', 'test': 'Test'}
         # Dataset A
-        dataset_A = ImageFolder(root=opt.dataroot + 'A/' + opt.phase,
+        dataset_A = ImageFolder(root=opt.dataroot + '/A/' + opt.phase,
                                 transform=transform, return_paths=True, rgb=opt.rgb_in,
                                 fineSize=opt.fineSize, loadSize=opt.loadSize,
                                 font_trans=True, no_permutation=opt.no_permutation)
         len_A = len(dataset_A.imgs)
         shuffle_inds = np.random.permutation(len_A)
 
-        dataset_B = ImageFolder(root=opt.dataroot + 'B/' + opt.phase,
+        dataset_B = ImageFolder(root=opt.dataroot + '/B/' + opt.phase,
                                 transform=transform, return_paths=True, rgb=opt.rgb_out,
                                 fineSize=opt.fineSize, loadSize=opt.loadSize,
                                 font_trans=False, no_permutation=opt.no_permutation)
@@ -342,7 +337,7 @@ class PartialDataLoader(BaseDataLoader):
         dic_phase = {'train': 'Train', 'test': 'Test'}
         # Dataset A
 
-        dataset_A = ImageFolder(root=opt.dataroot + 'A/' + opt.phase,
+        dataset_A = ImageFolder(root=opt.dataroot + '/A/' + opt.phase,
                                 transform=transform, return_paths=True, rgb=opt.rgb, fineSize=opt.fineSize,
                                 loadSize=opt.loadSize, font_trans=False, no_permutation=opt.no_permutation)
         len_A = len(dataset_A.imgs)
@@ -351,7 +346,7 @@ class PartialDataLoader(BaseDataLoader):
         else:
             shuffle_inds = range(len_A)
 
-        dataset_B = ImageFolder(root=opt.dataroot + 'B/' + opt.phase,
+        dataset_B = ImageFolder(root=opt.dataroot + '/B/' + opt.phase,
                                 transform=transform, return_paths=True, rgb=opt.rgb, fineSize=opt.fineSize,
                                 loadSize=opt.loadSize, font_trans=False, no_permutation=opt.no_permutation)
 
@@ -429,10 +424,12 @@ class DataLoader(BaseDataLoader):
 
         self.dataset = dataset
         dict_inds = {}
-        test_dict = opt.dataroot+'/test_dict/dict.pkl'
+        test_dict = opt.dataroot + '/test_dict/dict.pkl'
+        print("test_dict", test_dict)
         if opt.phase == 'test':
             if os.path.isfile(test_dict):
-                dict_inds = pickle.load(open(test_dict))
+                with open(test_dict, 'rb') as f:
+                    dict_inds = pickle.load(f, encoding='bytes')
             else:
                 warnings.warn(
                     'Blanks in test data are random. create a pkl file in ~/data_path/test_dict/dict.pkl including predifined random indices')

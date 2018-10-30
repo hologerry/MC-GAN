@@ -12,7 +12,7 @@
 #=====================================
 
 DATA=$1
-DATASET="../datasets/public_web_fonts/${DATA}/"
+DATASET="../datasets/public_web_fonts/${DATA}"
 experiment_dir="${DATA}_MCGAN_train"
 base_dir="../datasets/Capitals64/BASE"
 NAME="${experiment_dir}"
@@ -34,10 +34,12 @@ LAM_A=300
 LAM_C=10
 NITER=400
 NITERD=300
-BATCHSIZE=7
+BATCHSIZE=8
 EPOCH=400
 EPOCH1=$(($NITER+$NITERD))
 CUDA_ID=0
+CUDA_ID=$2
+DISPLAY_ID=999
 
 
 if [ ! -d "./checkpoints/${experiment_dir}" ]; then
