@@ -32,12 +32,12 @@ FINESIZE=64
 LOADSIZE=64
 LAM_A=300
 LAM_C=10
-NITER=400
-NITERD=300
-BATCHSIZE=8
-EPOCH=400
+NITER=6
+NITERD=8
+BATCHSIZE=6
+EPOCH=latest
 EPOCH1=$(($NITER+$NITERD))
-CUDA_ID=0
+CUDA_ID=$2
 DISPLAY_ID=999
 
 
@@ -53,9 +53,9 @@ fi
 ##COPY pretrained network from its corresponding directory
 # =======================================
 model_1_pretrained="./checkpoints/GlyphNet_pretrain"
-if [ ! -f "./checkpoints/${experiment_dir}/400_net_G.pth" ]; then
-    cp "${model_1_pretrained}/400_net_G.pth" "./checkpoints/${experiment_dir}/"
-    cp "${model_1_pretrained}/400_net_G_3d.pth" "./checkpoints/${experiment_dir}/"
+if [ ! -f "./checkpoints/${experiment_dir}/latest_net_G.pth" ]; then
+    cp "${model_1_pretrained}/latest_net_G.pth" "./checkpoints/${experiment_dir}/"
+    cp "${model_1_pretrained}/latest_net_G_3d.pth" "./checkpoints/${experiment_dir}/"
 fi
 
 

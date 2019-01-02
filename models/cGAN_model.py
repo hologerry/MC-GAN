@@ -97,21 +97,26 @@ class cGANModel(BaseModel):
     def set_input(self, input):
         input_A = input['A']
         input_B = input['B']
-        print("input_A: ", input_A.size())
-        print("input_B: ", input_B.size())
+        # print("input_A: ", input_A.size())
+        # print("input_B: ", input_B.size())
         self.input_A.resize_(input_A.size()).copy_(input_A)
         self.input_B.resize_(input_B.size()).copy_(input_B)
         self.image_paths = input['A_paths']
 
     def forward(self):
         self.real_A = self.input_A
+        # print("self real_A size", self.real_A.size()) # b 26 64 64
         if self.opt.conv3d:
             self.real_A_indep = self.netG_3d.forward(self.real_A.unsqueeze(2))
+            # print("self real_A_indep size", self.real_A_indep.size())  # b 26 1 64 64
             self.fake_B = self.netG.forward(self.real_A_indep.squeeze(2))
+            # print("self fake_B size", self.fake_B.size())  # b 26 64 64
         else:
             self.fake_B = self.netG.forward(self.real_A)
+            # print("self fake_B size", self.fake_B.size())  # b 26 64 64
 
         self.real_B = self.input_B
+        # print("self real_B size", self.real_B.size())  # b 26 64 64
         # real_B = util.tensor2im(self.real_B.data)
         # real_A = util.tensor2im(self.real_A.data)
 
@@ -153,9 +158,9 @@ class cGANModel(BaseModel):
         b, c, m, n = self.fake_B.size()
         # rgb = 3 if self.opt.rgb else 1
 
-        self.fake_B_reshaped = self.fake_B
-        self.real_A_reshaped = self.real_A
-        self.real_B_reshaped = self.real_B
+        self.fake_B_reshaped = self.fake_B  # b 26 64 64
+        self.real_A_reshaped = self.real_A  # b 26 64 64
+        self.real_B_reshaped = self.real_B  # b 26 64 64
 
         if self.opt.conditional:
             fake_AB = self.fake_AB_pool.query(torch.cat((self.real_A_reshaped, self.fake_B_reshaped), 1))

@@ -12,14 +12,14 @@ import functools
 
 def weights_init(m):
     classname = m.__class__.__name__
-    print("classname", classname)
+    # print("classname", classname)
     if classname.find('Conv') != -1:
-        print("in random conv")
+        # print("in random conv")
         m.weight.data.normal_(0.0, 0.02)
         if hasattr(m.bias, 'data'):
             m.bias.data.fill_(0)
     elif classname.find('BatchNorm2d') != -1:
-        print("in random batchnorm")
+        # print("in random batchnorm")
         m.weight.data.normal_(1.0, 0.02)
         m.bias.data.fill_(0)
 
@@ -327,17 +327,17 @@ class ResnetDecoder(nn.Module):
             return self.model(input)
 
 
-class UnetGenerator(nn.module):
+class UnetGenerator(nn.Module):
     def __init__(self, input_nc, output_nc, n_blocks, ngf, norm_layer, use_dropout, gpu_ids):
         pass
 
 
-class UnetEncoder(nn.module):
+class UnetEncoder(nn.Module):
     def __init__(self, input_nc, output_nc, n_blocks, ngf, norm_layer, use_dropout, gpu_ids):
         pass
 
 
-class UnetDecoder(nn.module):
+class UnetDecoder(nn.Module):
     def __init__(self, input_nc, output_nc, n_blocks, ngf, norm_layer, use_dropout, gpu_ids):
         pass
 

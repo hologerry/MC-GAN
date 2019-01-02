@@ -32,6 +32,7 @@ for epoch in range(1, opt.niter + opt.niter_decay + 1):
         total_steps += opt.batchSize
         epoch_iter = total_steps - dataset_size * (epoch - 1)
         model.set_input(data)
+        # print("cGAN data keys:", data.keys())
         model.optimize_parameters()
 
         if total_steps % opt.display_freq == 0:

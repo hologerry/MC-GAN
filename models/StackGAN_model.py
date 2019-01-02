@@ -139,15 +139,15 @@ class StackGANModel(BaseModel):
                                                  lr=opt.lr, betas=(opt.beta1, 0.999))
 
             print('---------- Networks initialized -------------')
-            if self.opt.conv3d:
-                networks.print_network(self.netG_3d)
-            networks.print_network(self.netG)
-            networks.print_network(self.netE1)
-            networks.print_network(self.netDE1)
-            if opt.which_model_preNet != 'none':
-                networks.print_network(self.preNet_A)
+            # if self.opt.conv3d:
+            #     networks.print_network(self.netG_3d)
+            # networks.print_network(self.netG)
+            # networks.print_network(self.netE1)
+            # networks.print_network(self.netDE1)
+            # if opt.which_model_preNet != 'none':
+            #     networks.print_network(self.preNet_A)
 
-            networks.print_network(self.netD1)
+            # networks.print_network(self.netD1)
             print('-----------------------------------------------')
 
             self.initial = True
@@ -155,13 +155,20 @@ class StackGANModel(BaseModel):
     def set_input(self, input):
         input_A0 = input['A']
         input_B0 = input['B']
+        print("stack gan input A0 size", input_A0.size())
+        print("stack gan input B0 size", input_B0.size())
+        print("StackGAN input keys:", input.keys())
         self.input_A0.resize_(input_A0.size()).copy_(input_A0)
         self.input_B0.resize_(input_B0.size()).copy_(input_B0)
         self.image_paths = input['B_paths']
 
+        print("stack gan self input A0 size", self.input_A0.size())
+        print("stack gan self input B0 size", self.input_B0.size())
+
         if self.opt.base_font:
             input_base = input['A_base']
             self.input_base.resize_(input_base.size()).copy_(input_base)
+            print("stack gan self input base size", self.input_base.size())
 
             b, c, m, n = self.input_base.size()
 
@@ -173,14 +180,16 @@ class StackGANModel(BaseModel):
                     real_base[batch, 2, :, :] = self.input_base[0, batch, :, :]
 
             self.real_base = torch.tensor(real_base, requires_grad=False)
+            print("stack gan self real base size", self.real_base.size())
 
         if self.opt.isTrain:
-
-            self.id_ = {}
-            self.obs = []
+            self.id_ = {}  # char to batch_id dict batch_id aka 0~
+            self.obs = []  # chars list
             for i, im in enumerate(self.image_paths):
                 self.id_[int(im.split('/')[-1].split('.png')[0].split('_')[-1])] = i
                 self.obs += [int(im.split('/')[-1].split('.png')[0].split('_')[-1])]
+            # if its not train char set to random batch id
+            # 26 -> batch id
             for i in list(set(range(self.opt.output_nc))-set(self.obs)):
                 self.id_[i] = np.random.randint(low=0, high=len(self.image_paths))
 
@@ -204,23 +213,28 @@ class StackGANModel(BaseModel):
 
     def forward0(self):
         self.real_A0 = torch.tensor(self.input_A0)
+        print("stack gan self real A0 size", self.real_A0.size())
         if self.opt.conv3d:
             self.real_A0_indep = self.netG_3d.forward(self.real_A0.unsqueeze(2))
+            print("stack gan self real A0 indep size", self.real_A0_indep.size())
             self.fake_B0 = self.netG.forward(self.real_A0_indep.squeeze(2))
+            print("stack gan self fake B0 size", self.fake_B0.size())
         else:
             self.fake_B0 = self.netG.forward(self.real_A0)
+            print("stack gan self fake B0 size", self.fake_B0.size())
         if self.initial:
-            if self.opt.orna:
+            if self.opt.orna:  # False
                 self.fake_B0_init = self.real_A0
             else:
                 self.fake_B0_init = self.fake_B0
+        print("stack gan self fake B0 init", self.fake_B0_init.size())
 
     def forward1(self, inp_grad=False):
         b, c, m, n = self.real_A0.size()
 
         self.batch_ = b
         self.out_id = self.obs
-        real_A1 = self.Tensor(self.opt.output_nc, self.opt.input_nc_1, m, n)
+        real_A1 = self.Tensor(self.opt.output_nc, self.opt.input_nc_1, m, n)  # 26 3 m n
         if self.opt.orna:
             inp_orna = self.fake_B0_init
         else:
@@ -228,10 +242,12 @@ class StackGANModel(BaseModel):
 
         for batch in range(self.opt.output_nc):
             if not self.opt.rgb_in and self.opt.rgb_out:
+                # print("sao operation 0")
                 real_A1[batch, 0, :, :] = inp_orna.data[self.id_[batch], batch, :, :]
                 real_A1[batch, 1, :, :] = inp_orna.data[self.id_[batch], batch, :, :]
                 real_A1[batch, 2, :, :] = inp_orna.data[self.id_[batch], batch, :, :]
             else:
+                # print("sao operation 1")
                 # TODO
                 real_A1[batch, :, :, :] = inp_orna.data[batch, self.out_id[batch]*np.array(self.opt.input_nc_1):
                                                         (self.out_id[batch]+1)*np.array(self.opt.input_nc_1), :, :]
@@ -241,16 +257,23 @@ class StackGANModel(BaseModel):
 
         self.real_A1_s = torch.tensor(real_A1, requires_grad=inp_grad)
         self.real_A1 = self.real_A1_s
+        print("stack gan self real A1 size", self.real_A1.size())
 
         self.fake_B1_emb = self.netE1.forward(self.real_A1)
+        print("stack gan self fake B1 emb size", self.fake_B1_emb.size())
         self.fake_B1 = self.netDE1.forward(self.fake_B1_emb)
+        print("stack gan self fake B1 size", self.fake_B1.size())
         self.real_B1 = torch.tensor(self.input_B0)
+        print("stack gan self real B1 size", self.real_B1.size())
 
         self.real_A1_gt_s = torch.tensor(self.all2observed(inp_orna), requires_grad=True)
         self.real_A1_gt = (self.real_A1_gt_s)
+        print("stack gan self real A1 gt size", self.real_A1_gt.size())
 
         self.fake_B1_gt_emb = self.netE1.forward(self.real_A1_gt)
+        print("stack gan self fake B1 gt emb size", self.fake_B1_gt_emb.size())
         self.fake_B1_gt = self.netDE1.forward(self.fake_B1_gt_emb)
+        print("stack gan self fake B1 gt size", self.fake_B1_gt.size())
 
         obs_ = torch.cuda.LongTensor(self.obs) if self.opt.gpu_ids else LongTensor(self.obs)
 
@@ -405,6 +428,8 @@ class StackGANModel(BaseModel):
             if self.opt.which_model_preNet != 'none':
                 self.loss_G1_GAN += self.criterionGAN(pred_fake_GL, True)
 
+        print("backward G1 self fake_B1_gt size", self.fake_B1_gt.size())
+        print("backward G1 self real_B1 size", self.real_B1.size())
         self.loss_G1_L1 = self.criterionL1(self.fake_B1_gt, self.real_B1) * self.opt.lambda_A
         fake_B1_gray = 1-torch.nn.functional.sigmoid(100*(torch.mean(self.fake_B1, dim=1, keepdim=True)-0.9))
         real_A1_gray = 1-torch.nn.functional.sigmoid(100*(torch.mean(self.real_A1, dim=1, keepdim=True)-0.9))
