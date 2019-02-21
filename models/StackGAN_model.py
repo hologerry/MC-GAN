@@ -560,7 +560,7 @@ class StackGANModel(BaseModel):
         real_A = util.tensor2im(real_A_all)
         fake_B = util.tensor2im(fake_B_all)
         real_B = util.tensor2im(self.real_B1.data)
-        return OrderedDict([('real_A', real_A), ('fake_B', fake_B), ('real_B', real_B)])
+        return OrderedDict([('real_A', real_A), ('fake_B', fake_B), ('real_B', real_B), ('fake_B_t', fake_B_all), ('real_B_t', self.real_B1)])
 
     def save(self, label):
         if not self.opt.no_Style2Glyph:
