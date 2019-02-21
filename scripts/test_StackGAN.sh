@@ -14,6 +14,7 @@ DATA=$1
 DATASET="../datasets/public_web_fonts/${DATA}/"
 base_dir="../datasets/Capitals64/BASE"
 experiment_dir="${DATA}_MCGAN_train"
+RESULTS_DIR="./results/${DATA}"
 NAME="${experiment_dir}"
 MODEL=StackGAN
 MODEL_G=resnet_6blocks
@@ -61,4 +62,4 @@ CUDA_VISIBLE_DEVICES=${CUDA_ID} python test_Stack.py --dataroot ${DATASET} --nam
 								 --norm ${NORM} --input_nc ${IN_NC} --output_nc ${O_NC} --input_nc_1 ${IN_NC_1} --output_nc_1 ${O_NC_1}\
 								 --which_model_preNet ${PRENET} --fineSize ${FINESIZE} --loadSize ${LOADSIZE} --display_id 0\
 								 --batchSize 1 --conditional --rgb_out --partial --align_data --which_epoch ${EPOCH} --which_epoch1 ${EPOCH1}\
-								 --blanks 0 --conv3d  --base_root ${base_dir}
+								 --blanks 0 --conv3d  --base_root ${base_dir} --results_dir ${RESULTS_DIR}
