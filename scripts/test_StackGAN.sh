@@ -11,7 +11,7 @@
 ## Set Parameters
 #=====================================
 DATA=$1
-DATASET="../datasets/public_web_fonts/${DATA}"
+DATASET="../datasets/public_web_fonts/${DATA}/"
 base_dir="../datasets/Capitals64/BASE"
 experiment_dir="${DATA}_MCGAN_train"
 NAME="${experiment_dir}"
@@ -29,11 +29,9 @@ PRENET=2_layers
 FINESIZE=64
 LOADSIZE=64
 BATCHSIZE=1
-EPOCH1=300
+EPOCH1=700
 EPOCH=400
 CUDA_ID=$2
-DISPLAY_ID=999
-
 
 
 if [ ! -d "./checkpoints/${experiment_dir}" ]; then
@@ -63,21 +61,4 @@ CUDA_VISIBLE_DEVICES=${CUDA_ID} python test_Stack.py --dataroot ${DATASET} --nam
 								 --norm ${NORM} --input_nc ${IN_NC} --output_nc ${O_NC} --input_nc_1 ${IN_NC_1} --output_nc_1 ${O_NC_1}\
 								 --which_model_preNet ${PRENET} --fineSize ${FINESIZE} --loadSize ${LOADSIZE} --display_id 0\
 								 --batchSize 1 --conditional --rgb_out --partial --align_data --which_epoch ${EPOCH} --which_epoch1 ${EPOCH1}\
-								 --blanks 0 --conv3d  --base_root ${base_dir} --display_id ${DISPLAY_ID}
-
-
-
-# =======================================
-## test only the second network for clean b/w glyphs
-# =======================================
-
-# CUDA_VISIBLE_DEVICES=${CUDA_ID} python test_Stack.py --dataroot ${DATASET} --name "${experiment_dir}" --model ${MODEL}\
-								 # --which_model_netG ${MODEL_G} --which_model_netD ${MODEL_D} --n_layers_D ${n_layers_D} --norm ${NORM} \
-								 # --input_nc ${IN_NC} --output_nc ${O_NC} --input_nc_1 ${IN_NC_1} --output_nc_1 ${O_NC_1} --which_model_preNet ${PRENET}\
-								 #  --fineSize ${FINESIZE} --loadSize ${LOADSIZE} --align_data --display_id 0 \
-								 #  --batchSize 1 --conditional --rgb_out --partial  --which_epoch ${EPOCH} --which_epoch1 ${EPOCH1} --blanks 0\
-								 #   --conv3d --no_Style2Glyph --orna --base_root ${base_dir}
-
-
-
-
+								 --blanks 0 --conv3d  --base_root ${base_dir}
