@@ -46,3 +46,4 @@ class TrainOptions(BaseOptions):
                                  '[opt.checkpoints_dir]/[opt.name]/web/')
         self.parser.add_argument('--noisy_disc', action='store_true',
                                  help='add noise to the discriminator target labels')
+        self.parser.add_argument('--results_dir', type=str, default='./results/', help='saves results here.')

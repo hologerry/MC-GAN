@@ -23,5 +23,3 @@ class TestOptions(BaseOptions):
         self.parser.add_argument('--which_epoch1', type=str, default='0',
                                  help='which epoch of the en2end model to load?')
         self.parser.add_argument('--how_many', type=int, default=1500, help='how many test images to run')
-        self.isTrain = False
-        return self.parser
