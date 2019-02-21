@@ -428,8 +428,8 @@ class StackGANModel(BaseModel):
             if self.opt.which_model_preNet != 'none':
                 self.loss_G1_GAN += self.criterionGAN(pred_fake_GL, True)
 
-        print("backward G1 self fake_B1_gt size", self.fake_B1_gt.size())
-        print("backward G1 self real_B1 size", self.real_B1.size())
+        # print("backward G1 self fake_B1_gt size", self.fake_B1_gt.size())
+        # print("backward G1 self real_B1 size", self.real_B1.size())
         self.loss_G1_L1 = self.criterionL1(self.fake_B1_gt, self.real_B1) * self.opt.lambda_A
         fake_B1_gray = 1-torch.nn.functional.sigmoid(100*(torch.mean(self.fake_B1, dim=1, keepdim=True)-0.9))
         real_A1_gray = 1-torch.nn.functional.sigmoid(100*(torch.mean(self.real_A1, dim=1, keepdim=True)-0.9))
