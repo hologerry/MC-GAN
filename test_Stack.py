@@ -17,7 +17,7 @@ from util.visualizer import Visualizer
 from pdb import set_trace as st
 from util import html
 
-import torch
+import numpy as np
 
 opt.nThreads = 1  # test code only supports nThreads=1
 opt.batchSize = 1  # test code only supports batchSize=1
@@ -47,11 +47,10 @@ for i, data in enumerate(dataset):
     model.set_input(data)
     model.test()
     visuals = model.get_current_visuals()
-    real_B = visuals['real_B_t']
-    fake_B = visuals['fake_B_t']
-    with torch.no_grad():
-        test_l1_loss = torch.nn.functional.l1_loss(fake_B, real_B)
-        mean_l1_loss += test_l1_loss.item()
+    real_B = visuals['real_B']
+    fake_B = visuals['fake_B']
+    test_l1_loss = np.mean(np.abs(real_B-fake_B))
+    mean_l1_loss += test_l1_loss
     cnt += 1
     img_path = model.get_image_paths()
     print('process image... %s' % img_path)
